@@ -53,22 +53,14 @@ struct Material {
   float shininess; // Phong exponent for material shininess
 };
 
-struct GeoTransform {
+typedef struct geoTransform {
   string type; // "t" | "r" | "s"
 
   // Has size 4 for rotate and 3 for the rest
   // params[3] = angle param for rotate
   vector<float> params;
-};
+} GeoTransform;
 
-/*struct GeoTransform {
-  vector<MatrixXd> t; // Translate
-  vector<MatrixXd> r; // Rotate
-  vector<MatrixXd> s; // Scale
-  vector<Transform> all; // Transform objs
-  MatrixXd SR;
-  MatrixXd all;
-};*/
 
 struct Obj {
   char * filename;
@@ -109,6 +101,16 @@ vector<Obj> instances;
 vector<Light> lights;
 // Holds camera transform params
 Camera cam;
+
+// Implementation
+string light_text;
+string originals_text;
+string instance_text;
+
+// For Arc-Ball
+GeoTransform last_rotation;
+GeoTransform current_rotation;
+int px_start, py_start;
 
 
 #endif

@@ -129,6 +129,8 @@ void init_lights()
     glEnable(GL_LIGHTING);
     
     int num_lights = lights.size();
+
+    debug_lights(lights);
     
     for(int i = 0; i < num_lights; ++i)
     {
@@ -149,8 +151,6 @@ void init_lights()
          * - float* values: a set of values to set for the specified property
          *                  e.g. an array of RGB values for the light's color
          */
-
-       
 
         float * color = new float[2];
         
@@ -412,8 +412,8 @@ void display(void)
      * See the 'mouse_moved' function for more details for 
      * y_view_angle and x_view_angle
      */
-    // glRotatef(y_view_angle, 1, 0, 0);
-    // glRotatef(x_view_angle, 0, 1, 0);
+    glRotatef(y_view_angle, 1, 0, 0);
+    glRotatef(x_view_angle, 0, 1, 0);
     
     /* 
      * Specify the inverse rotation of the camera by its
@@ -435,7 +435,6 @@ void display(void)
     
     set_lights();
 
-    // TODO
     draw_objects();
 
     glutSwapBuffers();
@@ -447,7 +446,7 @@ void create_lights(string light_text){
   string comma; // Placeholder for delimiting comma
   while (line_stream >> property){
     //line_stream >> property;
-    //cout << "property: " << property << endl;
+    cout << "property: " << property << endl;
     if (property == "light"){
       Light l;
       line_stream >> l.x >> l.y >> l.z >> comma;
@@ -477,6 +476,7 @@ void create_camera(string cam_text){
       cam.perspective[property] = p;
     }
   }
+  debug_camera(cam);
 }
 
 // Parses .obj file
@@ -721,11 +721,11 @@ void parse(string file){
   //////////////////////////////
   // Generate lights
   ///////////////////////////////
-  string light_text;
+  //string light_text;
   while (getline(infile, line) && !line.empty()){
     light_text += line + " ";
   }
-  create_lights(light_text);
+  //create_lights(light_text);
   //debug_lights(lights);
 
   //////////////////////////////
@@ -733,18 +733,18 @@ void parse(string file){
   ///////////////////////////////
   getline(infile, line);
   assert(line == "objects:");
-  string originals_text;
+  //string originals_text;
   while (getline(infile, line) && !line.empty()){
     // Assume format: "objectname objectfile.obj"
     originals_text += line + " ";
   }
-  create_originals(originals_text);
+  //create_originals(originals_text);
 
   ///////////////////////////////
   // Generate map associating object with list of transforms
   ///////////////////////////////
   
-  string instance_text;
+  //string instance_text;
   while (getline(infile, line)){
     if (line.size() == 0){
         instance_text += " \\ ";
@@ -752,7 +752,7 @@ void parse(string file){
         instance_text += line + " ";
     }
   }
-  create_instances(instance_text);
+  //create_instances(instance_text);
   /*for (auto &i : instances){
     cout << "Instance-----" << endl;
     debug_obj(i);
@@ -769,7 +769,9 @@ void parse(string file){
  * states that we want it to be in.
  */
 void init(string textfile)
-{
+{ 
+    
+
     /* The following line of code tells OpenGL to use "smooth shading" (aka
      * Gouraud shading) when rendering.
      */
@@ -822,7 +824,6 @@ void init(string textfile)
     /* ^tells OpenGL to set the current main matrix (which is the Projection
      * Matrix right now) to the identity matrix. Then, the next line of code:
      */
-
     parse(textfile);
     //cout << "Parsed objects!" << endl;
     glFrustum(cam.perspective["left"], cam.perspective["right"],
@@ -844,9 +845,17 @@ void init(string textfile)
      * The reason we have these procedures as separate functions is to make
      * the code more organized.
      */
-    //create_objects();
-    //create_lights();
-    
+    create_originals(originals_text);
+    create_instances(instance_text);
+    create_lights(light_text);
+
+     // Arc ball initialization
+    vector<float> id{0,0,0,0};
+    last_rotation.params = id;
+    current_rotation.params = id;
+    last_rotation.type = "r";
+    current_rotation.type = "r";
+
     init_lights();
 }
 
@@ -918,6 +927,10 @@ void mouse_pressed(int button, int state, int x, int y)
          */
         mouse_x = x;
         mouse_y = y;
+
+        // For ArcBall
+        px_start = x;
+        py_start = y;
         
         /* Since the mouse is being pressed down, we set our 'is_pressed"
          * boolean indicator to true.
@@ -1107,7 +1120,7 @@ void key_pressed(unsigned char key, int x, int y)
 int main(int argc, char* argv[])
 {
     if (argc < 4){
-        cout << "Usage: ./shaded_renderer [scene_description_file.txt] [xres] [yres]"
+        cout << "Usage: ./opengl_shader [scene_description_file.txt] [xres] [yres]"
           << endl;
         return 0;
     }
@@ -1118,34 +1131,34 @@ int main(int argc, char* argv[])
     textfile = argv[1];
     
     /* 'glutInit' intializes the GLUT (Graphics Library Utility Toolkit) library.
-     * This is necessary, since a lot of the functions we used above and below
-     * are from the GLUT library.
-     *
-     * 'glutInit' takes the 'main' function arguments as parameters. This is not
-     * too important for us, but it is possible to give command line specifications
-     * to 'glutInit' by putting them with the 'main' function arguments.
      */
     glutInit(&argc, argv);
     //cout << "glutInit" << endl;
-    /* The following line of code tells OpenGL that we need a float buffer,
+    
+    /* Tell OpenGL that we need a float buffer,
      * a RGB pixel buffer, and a depth buffer.
      */
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     //cout << "glutInitDisplayMode" << endl;
-    /* The following line tells OpenGL to create a program window of size
+    
+    /* Create a program window of size
      * 'xres' by 'yres'.
      */
     glutInitWindowSize(xres, yres);
     //cout << "glutInitWindowSize" << endl;
-    /* The following line tells OpenGL to set the program window in the top-left
+    
+    /* Set the program window in the top-left
      * corner of the computer screen (0, 0).
      */
     glutInitWindowPosition(0, 0);
     //cout << "glutInitWindowPosition" << endl;
+    
+
     /* The following line tells OpenGL to name the program window "Test".
      */
     glutCreateWindow("Test");
     //cout << "glutCreateWindow" << endl;
+    
     /* Call our 'init' function...
      */
     init(textfile);
@@ -1174,6 +1187,6 @@ int main(int argc, char* argv[])
     //  * mouse, and keyboard functions to essentially run our program.
     //  */
     glutMainLoop();
-    cout << "glutMainLoop" << endl;
+    
 }
 

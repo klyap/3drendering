@@ -13,8 +13,8 @@ using namespace Eigen;
 using namespace std;
 
 string directory = "data/";
-int x_dim = 400;
-int y_dim = 400;
+int x_dim = 100;
+int y_dim = 100;
 
 
 typedef struct vertex {

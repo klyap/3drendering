@@ -27,10 +27,26 @@ Obj parse_obj(char * filename){
       vertices.push_back(v);
 
     } else if (type == 'f'){
-      Face f;
+      /*Face f;
       f.x = (int) x;
       f.y = (int) y;
       f.z = (int) z;
+      faces.push_back(f);*/
+
+      string v1;
+      string v2;
+      string v3;
+
+      infile >> v1 >> v2 >> v3;
+      std::string delimiter = "//";
+      string x = v1.substr(0, v1.find(delimiter));
+      string y = v2.substr(0, v2.find(delimiter));
+      string z = v3.substr(0, v3.find(delimiter));
+
+      Face f;
+      f.x = atoi(x.c_str());
+      f.y = atoi(y.c_str());
+      f.z = atoi(z.c_str());
       faces.push_back(f);
     }
 
@@ -149,31 +165,15 @@ MatrixXd parse_transform(char * filename){
            0, 0, 0, 1; // row4*/
 
       MatrixXd m = make_translate_matrix(x, y, z);
-
+      //cout << "One transform: "<< endl << m << endl;
       all_transforms.push_back(m);
 
     } else if (type == 'r'){
       // ROTATE MATRIX
       infile >> x >> y >> z >> a;
 
-      /*double a1 = x * x + (1 - x * x) * cos(a);
-      double a2 = x * y * (1 - cos(a)) - z * sin(a);
-      double a3 = x * z * (1 - cos(a)) + y * sin(a);
-      double b1 = y * x * (1 - cos(a)) + z * sin(a);
-      double b2 = y * y + (1 - y * y) * cos(a);
-      double b3 = y * z * (1 - cos(a)) - x * sin(a);
-      double c1 = z * x * (1 - cos(a)) - y * sin(a);
-      double c2 = z * y * (1 - cos(a)) + x * sin(a);
-      double c3 = z * z + (1 - z * z) * cos(a);
-
-      MatrixXd m(4,4); // m is constructed as a 4x4 matrix  
-      m << a1, a2, a3, 0, // row1  
-           b1, b2, b3, 0, // row2  
-           c1, c2, c3, 0, // row3  
-           0, 0, 0, 1; // row4*/
-
       MatrixXd m = make_rotation_matrix(x, y, z, a);
-
+      //cout << "One transform: "<< endl << m << endl;
       all_transforms.push_back(m);
 
     } else if (type == 's'){
@@ -184,7 +184,7 @@ MatrixXd parse_transform(char * filename){
            0, y, 0, 0, // row2  
            0, 0, z, 0, // row3  
            0, 0, 0, 1; // row4
-
+      //cout << "One transform: "<< endl << m << endl;
       all_transforms.push_back(m);
     }
   }
@@ -699,7 +699,10 @@ int main (int argc, char* argv[])
         v << this_vertex.x, this_vertex.y, this_vertex.z, 1;
         
         // Vertex after geometric transform
+        /*cout << "Geo transform: " << endl;
+        cout << matrices[i] << endl;*/
         MatrixXd t = matrices[i] * v;
+        //cout << "World: " << endl << t << endl;
 
         // Vertex converted to homogenous NDC
         MatrixXd cam_transform = cam_pos * cam_orientation;
@@ -719,10 +722,11 @@ int main (int argc, char* argv[])
         // by dividing by -z_c (z coord of vertex)
         double neg_z_c = -1/C_vertex(2,0);
         MatrixXd cart_NDC = neg_z_c * homo_NDC;
-        /*
-        cout << "Cartesian NDC = " << neg_z_c << endl;
-        cout << cart_NDC.row(0) << " " << cart_NDC.row(1) << " " << cart_NDC.row(2) << endl;
-        */
+        
+        //cout << "Cartesian NDC = " << neg_z_c << endl;
+        //cout << cart_NDC.row(0) << " " << cart_NDC.row(1) << " " << cart_NDC.row(2) << endl;
+        //cout << "Cart_NDC: " << endl << cart_NDC << endl;
+
         Vertex v1;
         v1.x = cart_NDC(0,0);
         v1.y = cart_NDC(1,0);

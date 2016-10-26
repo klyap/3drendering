@@ -373,19 +373,39 @@ void draw_objects()
         glPopMatrix();
     }
     
-    
-    /* The following code segment uses OpenGL's built-in sphere rendering
-     * function to render the blue-ground that you are walking on when
-     * you run the program. The blue-ground is just the surface of a big
-     * sphere of radius 100.
-     */
-    /*glPushMatrix();
-    {
-        glTranslatef(0, -103, 0);
-        glutSolidSphere(100, 100, 100);
-    }
-    glPopMatrix();*/
 }
+
+MatrixXd Get_Current_Rotation(){
+  // Convert to unit quarternion
+  float norm = current_rotation.norm();
+  Vector4d unit_q = current_rotation * (1.0/norm); // TODO: is this cwise prod?
+  
+  float qs = unit_q[0];
+  float qx = unit_q[1];
+  float qy = unit_q[2];
+  float qz = unit_q[3];
+
+  float a0 = 1 - 2 * qy * qy - 2 * qz * qz;
+  float a1 = 2 * (qx * qy - qz * qs);
+  float a2 = 2 * (qx * qz + qy * qs);
+
+  float b0 = 2 * (qx * qy + qz * qs);
+  float b1 = 1 - 2 * qx * qx - 2 * qz * qz;
+  float b2 = 2 * (qy * qz - qx * qs);
+
+  float c0 = 2 * (qx * qz - qy * qs);
+  float c1 = 2 * (qy * qz + qx * qs);
+  float c2 = 1 - 2 * qx * qx - 2 * qy * qy;
+
+  MatrixXd r(4,4);
+  r << a0, a1, a2, 0,
+       b0, b1, b2, 0,
+       c0, c1, c2, 0,
+       0, 0, 0, 1;
+
+  return r;
+}
+
 
 /* 'display' function:
  * 
@@ -432,6 +452,9 @@ void display(void)
     glTranslatef(-cam.position[0], -cam.position[1], -cam.position[2]);
     /* ^ And that should be it for the camera transformations.
      */
+
+    // Arcball TODO
+    glMultMatrixd(Get_Current_Rotation().data());
     
     set_lights();
 
@@ -850,36 +873,66 @@ void init(string textfile)
     create_lights(light_text);
 
      // Arc ball initialization
-    vector<float> id{0,0,0,0};
-    last_rotation.params = id;
-    current_rotation.params = id;
-    last_rotation.type = "r";
-    current_rotation.type = "r";
 
     init_lights();
 }
 
+// Converts screen coords to NDC coords
+void screen_to_NDC(int a, int b, int &x, int &y){
+  x = (a + 1)/2.0 * (xres);
+  y = yres - ((b + 1)/2.0 * (yres));
+}
+
+int get_z(int x, int y){
+    float xy_squared = x * x + y * y;
+    if (xy_squared <= 1){
+        return sqrt(1 - xy_squared);
+    }
+
+    return 0;
+}
+
+void Compute_Rotation_Quarternion(
+    Vector4d &q,
+    int px_current, int py_current,
+    int px_start, int py_start){
+
+    //p' = px_current, py_current
+    //p = px_start, py_start
+    
+    // Construct p and p'
+    // Convert xy coords to NDC
+    int x1, y1, x2, y2;
+    screen_to_NDC(px_current, py_current, x1, y1);
+    screen_to_NDC(px_start, py_start, x2, y2);
+
+    // Get z component
+    int z1 = get_z(x1, y1);
+    int z2 = get_z(x2, y2);
+
+    // Construct p/p1 and p'/p2
+    Vector3d p1(x1, y1, z1);
+    Vector3d p2(x2, y2, z2);
+
+    // Find u and theta
+    float theta = acos(min(1.0, p1.dot(p2) / (p1.norm() * p2.norm())));
+    Vector3d u = p1.cross(p2).normalized();
+    
+    // Compute quarternion and assign
+    q[0] = cos(theta/2.0);        // qs
+    q[1] = u[0] * sin(theta/2.0); // qx
+    q[2] = u[1] * sin(theta/2.0); // qy
+    q[3] = u[2] * sin(theta/2.0); // qz
+
+}
 
 void reshape(int width, int height)
 {
-    /* The following two lines of code prevent the width and height of the
-     * window from ever becoming 0 to prevent divide by 0 errors later.
-     * Typically, we let 1x1 square pixel be the smallest size for the window.
-     */
+    /* Let 1x1 square pixel be the smallest size for the window. */
     height = (height == 0) ? 1 : height;
     width = (width == 0) ? 1 : width;
     
-    /* The 'glViewport' function tells OpenGL to determine how to convert from
-     * NDC to screen coordinates given the dimensions of the window. The
-     * parameters for 'glViewport' are (in the following order):
-     *
-     * - int x: x-coordinate of the lower-left corner of the window in pixels
-     * - int y: y-coordinate of the lower-left corner of the window in pixels
-     * - int width: width of the window
-     * - int height: height of the window
-     *
-     * We typically just let the lower-left corner be (0,0).
-     *
+    /* 
      * After 'glViewport' is called, OpenGL will automatically know how to
      * convert all our points from NDC to screen coordinates when it tries
      * to render them.
@@ -895,25 +948,27 @@ void reshape(int width, int height)
     mouse_scale_y = (float) (cam.perspective["top"] - cam.perspective["bottom"])
                    / (float) height;
     
-    /* The following line tells OpenGL that our program window needs to
-     * be re-displayed, meaning everything that was being displayed on
-     * the window before it got resized needs to be re-rendered.
-     */
+    /* Re-render */
     glutPostRedisplay();
 }
 
-/* 'mouse_pressed' function:
- * 
- * This function is meant to respond to mouse clicks and releases. The
- * parameters are:
- * 
- * - int button: the button on the mouse that got clicked or released,
- *               represented by an enum
- * - int state: either 'GLUT_DOWN' or 'GLUT_UP' for specifying whether the
- *              button was pressed down or released up respectively
- * - int x: the x screen coordinate of where the mouse was clicked or released
- * - int y: the y screen coordinate of where the mouse was clicked or released
- *
+Vector4d q_multiply(Vector4d a,Vector4d b){
+  
+  Vector3d va(a[1], a[2], a[3]);
+  Vector3d vb(b[1], b[2], b[3]);
+  Vector3d v;
+  Vector4d product;
+
+  float s = a[0] * b[0] - va.dot(vb);
+  Vector3d cross = va.cross(vb);
+  v = a[0] * vb + b[0] * va + cross;
+
+  product << s, v[0], v[1], v[2];
+
+  return product;
+}
+
+/*
  * The function doesn't really do too much besides set some variables that
  * we need for the 'mouse_moved' function.
  */
@@ -944,8 +999,13 @@ void mouse_pressed(int button, int state, int x, int y)
         /* Mouse is no longer being pressed, so set our indicator to false.
          */
         is_pressed = false;
+
+        // Arcball
+        last_rotation = q_multiply(current_rotation,last_rotation);
+        current_rotation << 1, 1, 1, 1; // Set to identity
     }
 }
+
 
 /* 'mouse_moved' function:
  *
@@ -964,59 +1024,27 @@ void mouse_moved(int x, int y)
      */
     if(is_pressed)
     {
-        /* You see in the 'mouse_pressed' function that when the left-mouse button
-         * is first clicked down, we store the screen coordinates of where the
-         * mouse was pressed down in 'mouse_x' and 'mouse_y'. When we move the
-         * mouse, its screen coordinates change and are captured by the 'x' and
-         * 'y' parameters to the 'mouse_moved' function. We want to compute a change
-         * in our camera angle based on the distance that the mouse traveled.
-         *
-         * We have two distances traveled: a dx equal to 'x' - 'mouse_x' and a
-         * dy equal to 'y' - 'mouse_y'. We need to compute the desired changes in
-         * the horizontal (x) angle of the camera and the vertical (y) angle of
-         * the camera.
-         * 
-         * Let's start with the horizontal angle change. We first need to convert
-         * the dx traveled in screen coordinates to a dx traveled in camera space.
-         * The conversion is done using our 'mouse_scale_x' variable, which we
-         * set in our 'reshape' function. We then multiply by our 'x_view_step'
-         * variable, which is an arbitrary value that determines how "fast" we
-         * want the camera angle to change. Higher values for 'x_view_step' cause
-         * the camera to move more when we drag the mouse. We had set 'x_view_step'
-         * to 90 at the top of this file (where we declared all our variables).
-         * 
-         * We then add the horizontal change in camera angle to our 'x_view_angle'
-         * variable, which keeps track of the cumulative horizontal change in our
-         * camera angle. 'x_view_angle' is used in the camera rotations specified
-         * in the 'display' function.
-         */
-        x_view_angle += ((float) x - (float) mouse_x) * mouse_scale_x * x_view_step;
-        
-        /* We do basically the same process as above to compute the vertical change
-         * in camera angle. The only real difference is that we want to keep the
-         * camera angle changes realistic, and it is unrealistic for someone in
-         * real life to be able to change their vertical "camera angle" more than
-         * ~90 degrees (they would have to detach their head and spin it vertically
-         * or something...). So we decide to restrict the cumulative vertical angle
-         * change between -90 and 90 degrees.
-         */
-        float temp_y_view_angle = y_view_angle +
-                                  ((float) y - (float) mouse_y) * mouse_scale_y * y_view_step;
-        y_view_angle = (temp_y_view_angle > 90 || temp_y_view_angle < -90) ?
-                       y_view_angle : temp_y_view_angle;
-        
-        /* We update our 'mouse_x' and 'mouse_y' variables so that if the user moves
-         * the mouse again without releasing it, then the distance we compute on the
-         * next call to the 'mouse_moved' function will be from this current mouse
-         * position.
-         */
-        mouse_x = x;
-        mouse_y = y;
-        
-        /* Tell OpenGL that it needs to re-render our scene with the new camera
-         * angles.
-         */
-        glutPostRedisplay();
+      
+      px_current = x;
+      py_current = y;
+
+      // Update current_rotation with new quarternion
+      Compute_Rotation_Quarternion(
+        current_rotation,
+        px_current, py_current, px_start, py_start);
+      
+      /* We update our 'mouse_x' and 'mouse_y' variables so that if the user moves
+       * the mouse again without releasing it, then the distance we compute on the
+       * next call to the 'mouse_moved' function will be from this current mouse
+       * position.
+       */
+      mouse_x = x;
+      mouse_y = y;
+      
+      /* Tell OpenGL that it needs to re-render our scene with the new camera
+       * angles.
+       */
+      glutPostRedisplay();
     }
 }
 

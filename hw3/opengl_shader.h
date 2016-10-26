@@ -108,9 +108,10 @@ string originals_text;
 string instance_text;
 
 // For Arc-Ball
-GeoTransform last_rotation;
-GeoTransform current_rotation;
-int px_start, py_start;
+// Initialize to identity
+Vector4d last_rotation(1, 1, 1, 1);
+Vector4d current_rotation(1, 1, 1, 1);
+int px_start, py_start, px_current, py_current;
 
 
 #endif

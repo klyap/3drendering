@@ -784,7 +784,7 @@ void set_lights()
  */
 void draw_objects()
 {
-    int num_objects = objects.size();
+    int num_objects = instances.size();
     
     for(int i = 0; i < num_objects; ++i)
     {
@@ -810,7 +810,7 @@ void draw_objects()
         /* The following brace is not necessary, but it keeps things organized.
          */
         {
-            int num_transform_sets = objects[i].transform_sets.size();
+            int num_transform_sets = instances[i].transform_sets.size();
             
             /* The loop tells OpenGL to modify our modelview matrix with the
              * desired geometric transformations for this object. Remember
@@ -844,16 +844,16 @@ void draw_objects()
              */
             for(int j = 0; j < num_transform_sets; ++j)
             {
-                glTranslatef(objects[i].transform_sets[j].translation[0],
-                             objects[i].transform_sets[j].translation[1],
-                             objects[i].transform_sets[j].translation[2]);
-                glRotatef(objects[i].transform_sets[j].rotation_angle,
-                          objects[i].transform_sets[j].rotation[0],
-                          objects[i].transform_sets[j].rotation[1],
-                          objects[i].transform_sets[j].rotation[2]);
-                glScalef(objects[i].transform_sets[j].scaling[0],
-                         objects[i].transform_sets[j].scaling[1],
-                         objects[i].transform_sets[j].scaling[2]);
+                glTranslatef(instances[i].geo_tranform[j].translation[0],
+                             instances[i].geo_tranform[j].translation[1],
+                             instances[i].geo_tranform[j].translation[2]);
+                glRotatef(instances[i].geo_tranform[j].rotation_angle,
+                          instances[i].geo_tranform[j].rotation[0],
+                          instances[i].geo_tranform[j].rotation[1],
+                          instances[i].geo_tranform[j].rotation[2]);
+                glScalef(instances[i].geo_tranform[j].scaling[0],
+                         instances[i].geo_tranform[j].scaling[1],
+                         instances[i].geo_tranform[j].scaling[2]);
             }
             
             /* The 'glMaterialfv' and 'glMaterialf' functions tell OpenGL
@@ -872,9 +872,21 @@ void draw_objects()
              * parameter is only a single float value instead of an array of
              * values. 'glMaterialf' is used to set the shininess property.
              */
-            glMaterialfv(GL_FRONT, GL_AMBIENT, objects[i].ambient_reflect);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, objects[i].diffuse_reflect);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, objects[i].specular_reflect);
+             float * ambient = new float[2];
+             ambient[0] = objects[i].ambient[0];
+             ambient[1] = objects[i].ambient[1];
+             ambient[2] = objects[i].ambient[2];
+             float * diffuse = new float[2];
+             diffuse[0] = objects[i].diffuse[0];
+             diffuse[1] = objects[i].diffuse[1];
+             diffuse[2] = objects[i].diffuse[2];
+             float * specular = new float[2];
+             specular[0] = objects[i].specular[0];
+             specular[1] = objects[i].specular[1];
+             specular[2] = objects[i].specular[2];
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
             glMaterialf(GL_FRONT, GL_SHININESS, objects[i].shininess);
             
             /* The next few lines of code are how we tell OpenGL to render
@@ -925,7 +937,7 @@ void draw_objects()
              * - void* pointer_to_array: this parameter is the pointer to
              *                           our vertex array.
              */
-            glVertexPointer(3, GL_FLOAT, 0, &objects[i].vertex_buffer[0]);
+            glVertexPointer(3, GL_FLOAT, 0, &objects[i].v[0]);
             /* The "normal array" is the equivalent array for normals.
              * Each normal in the normal array corresponds to the vertex
              * of the same index in the vertex array.

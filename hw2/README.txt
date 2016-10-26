@@ -8,7 +8,3 @@ To compile:
 
 xres and yres are integers that specify the xx and yy resolutions of the output image
 mode is either 0 or 1
-
-Image resolution:
-Specified in wireframe.h
-Automatically looks in directory called “data” for filename.txt

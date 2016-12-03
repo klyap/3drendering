@@ -23,7 +23,7 @@ namespace Assignment {
     static const int k_io_test_z_count = 15;
 
     // BEGIN -----------------------------------------------
-    Matrixfd makeRotation(Vector4f unit_q){
+    Matrix4f makeRotation(Vector4f unit_q){
       // Convert to unit quarternion
 
       Vector4f unit_q = unit_q.normalized();
@@ -45,7 +45,7 @@ namespace Assignment {
       float c1 = 2 * (qy * qz + qx * qs);
       float c2 = 1 - 2 * qx * qx - 2 * qy * qy;
 
-      Matrixfd r(4,4);
+      Matrix4f r(4,4);
       r << a0, a1, a2, 0,
            b0, b1, b2, 0,
            c0, c1, c2, 0,

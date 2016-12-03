@@ -67,7 +67,8 @@ namespace Assignment {
       }
       else if (type == SCALE){
         cout << "Transform scale: scale " << type << endl;
-        transform << 1/t.trans[0], 0, 0, 0,
+        transform <<
+                 1/t.trans[0], 0, 0, 0,
                  0, 1/t.trans[1], 0, 0,
                  0, 0, 1/t.trans[2], 0,
                  0, 0, 0, 1;
@@ -137,7 +138,9 @@ namespace Assignment {
 
              // Do in/out test
              //coords.normalize();
-             if (sq_io(coords[0], coords[1], coords[2], prm->getExp0(), prm->getExp1()) < 0){
+             int check_inside = sq_io(coords[0], coords[1], coords[2], prm->getExp0(), prm->getExp1());
+             cout << "sq_io returned: " << check_inside << endl;
+             if (check_inside == -1){
                return true;
              }
             return false;

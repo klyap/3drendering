@@ -1,0 +1,6 @@
+To compile:
+
+> make
+> ./keyframes [xres] [yres] [test.script]
+
+The rotation doesn’t work, but the scaling and translations do if you just comment out the gLRotate line.

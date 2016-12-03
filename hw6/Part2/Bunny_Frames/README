@@ -1,0 +1,6 @@
+To compile:
+
+> make
+> ./bunny_frames
+
+This generates the obj files for intermediate frames.

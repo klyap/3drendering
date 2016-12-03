@@ -1,0 +1,4 @@
+To compile:
+
+ > make
+ > ./simulate man.obj

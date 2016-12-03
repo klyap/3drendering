@@ -1,0 +1,4 @@
+To compile:
+
+> make
+> ./single_pendulum [xres] [yres] [x_start] [y_start]

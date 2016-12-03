@@ -1,0 +1,127 @@
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* The following are parameters for creating an interactive first-person camera
+ * view of the scene. The variables will make more sense when explained in
+ * context, so you should just look at the 'mousePressed', 'mouseMoved', and
+ * 'keyPressed' functions for the details.
+ */
+
+/*int mouse_x, mouse_y;
+float mouse_scale_x, mouse_scale_y;
+
+const float step_size = 0.2;
+const float x_view_step = 90.0, y_view_step = 90.0;
+float x_view_angle = 0, y_view_angle = 0;
+
+bool is_pressed = false;
+bool wireframe_mode = false;*/
+
+
+/* 'deg2rad' function:
+ * 
+ * Converts given angle in degrees to radians.
+ */
+float deg2rad(float angle);
+
+/* 'deg2rad' function:
+ * 
+ * Converts given angle in degrees to radians.
+ */
+float rad2deg(float rad);
+
+/* 'init_lights' function:
+ * 
+ * OpenGL has 8 built-in lights in all, each one with its own unique, integer
+ * ID value. 
+ * The first light's ID value is stored in 'GL_LIGHT0'. The second light's ID
+ * value is stored in 'GL_LIGHT1'.
+ */
+void init_lights();
+/* 'set_lights' function:
+ *
+ * While the 'init_lights' function enables and sets the colors of the lights,
+ * the 'set_lights' function is supposed to position the lights.
+ */
+void set_lights();
+// int i is index of the object in "instances" that we are
+// drawing right now
+void apply_geometric_transforms(int i);
+
+/* 'draw_objects' function:
+ *
+ * This function has OpenGL render our objects to the display screen. It
+ */
+void draw_objects();
+
+MatrixXd Get_Current_Rotation();
+
+
+/* 'display' function:
+ * 
+ * You will see down below in the 'main' function that whenever we create a
+ * window in OpenGL, we have to specify a function for OpenGL to call whenever
+ * it wants to render anything.
+ *
+ * The 'display' function is supposed to handle all the processing of points
+ * in world and camera space.
+ */
+void display(void);
+
+/* 'init' function:
+ * 
+ * The most important task of the 'init' function is to set OpenGL to the
+ * states that we want it to be in.
+ */
+void init(string textfile);
+// Converts screen coords to NDC coords
+void screen_to_NDC(int a, int b, float &x, float &y);
+
+double get_z(int x, int y);
+
+void Compute_Rotation_Quarternion(
+    Vector4d &q,
+    int px_current, int py_current,
+    int px_start, int py_start);
+
+void reshape(int width, int height);
+
+Vector4d q_multiply(Vector4d a,Vector4d b);
+/*
+ * The function doesn't really do too much besides set some variables that
+ * we need for the 'mouse_moved' function.
+ */
+void mouse_pressed(int button, int state, int x, int y);
+
+/* 'mouse_moved' function:
+ *
+ * This function is meant to respond to when the mouse is being moved. There
+ * are just two parameters to this function:
+ * 
+ * - int x: the x screen coordinate of where the mouse was clicked or released
+ * - int y: the y screen coordinate of where the mouse was clicked or released
+ *
+ * We compute our camera rotation angles based on the mouse movement in this
+ * function.
+ */
+void mouse_moved(int x, int y);
+
+
+
+/* 'key_pressed' function:
+ * 
+ * This function is meant to respond to key pressed on the keyboard. The
+ * parameters are:
+ *
+ * - unsigned char key: the character of the key itself or the ASCII value of
+ *                      of the key
+ * - int x: the x screen coordinate of where the mouse was when the key was pressed
+ * - int y: the y screen coordinate of where the mouse was when the key was pressed
+ *
+ * Our function is pretty straightforward as you can see below. We also do not make
+ * use of the 'x' and 'y' parameters.
+ */
+void key_pressed(unsigned char key, int x, int y);
+
+

@@ -1,0 +1,30 @@
+First, I forgot to mention that there is an extra scaling transformation included in the primitives themselves. Primitives have a variable called coeff (accessible by using the function const Vector3f& getCoeff()) that represent this built in scaling. You have to account for this scaling as if it's the very first transformation applied to this Primitive.
+
+Second, You can increase the x, y, z range of the IO test check by changing the variables:
+
+    static const float k_min_io_test_x = -7.0;
+    static const float k_max_io_test_x = 7.0;
+    static const float k_min_io_test_y = -7.0;
+    static const float k_max_io_test_y = 7.0;
+    static const float k_min_io_test_z = -7.0;
+    static const float k_max_io_test_z = 7.0;
+
+You can change the density of the test points by changing:
+
+    static const int k_io_test_x_count = 15;
+    static const int k_io_test_y_count = 15;
+    static const int k_io_test_z_count = 15;
+
+Note that increasing the number of test points may drastically slow down your program.
+
+
+
+1. You do not have to write any new OpenGL drawing instructions. All OpenGL drawing instructions required are done for you. It's okay if the resulting image is slightly different from the ones described by the instructions in the pdfs. For example, the pdfs say that you should draw blue dots for IO test points that are not inside any superquadrics. You don't have to do this and the provided OpenGL drawing instructions draw the red dots for you.
+
+2. For the Intersection Test, you have to iterate through the Renderables yourself. Don't worry though, I gave an example of how to do that in the IO Tests section. You are allowed to copy that code.
+
+3. When you do the Intersection Test, note that you have to retrieve the minimum t AND the appropriate primitive with its stack of transformations so that you can compute the normal at the intersection point. Design your code accordingly.
+
+For #3, it may be a good idea to compute the intersection ray and the t value for every primitive and select the min t and its corresponding ray (instead of finding min t and then computing the intersection ray). This will mean that you won't have to store and pass around stacks of transformations. This will make your code simpler and faster.
+
+4. If the ray does not hit any superquadric, set the result ray to have a direction vector of (0, 0, 0). This will make the OpenGL drawing instruction to draw nothing.

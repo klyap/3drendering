@@ -26,8 +26,8 @@ namespace Assignment {
     Matrixfd makeRotation(Vector4f unit_q){
       // Convert to unit quarternion
 
-      Vector4d unit_q = current_rotation.normalized();
-
+      Vector4f unit_q = unit_q.normalized();
+      cout << "rotation normalized: " << unit_q << endl;
       float qs = unit_q[0];
       float qx = unit_q[1];
       float qy = unit_q[2];
@@ -246,64 +246,66 @@ namespace Assignment {
     };
 
     Ray findIntersection(const Ray &camera_ray) {
-        /* TODO
-         *
-         **/
+      /* TODO
+      *
+      **/
 
-         const Line* cur_state = CommandLine::getState();
-         Renderable* ren = NULL; // current selected ren
+      const Line* cur_state = CommandLine::getState();
+      Renderable* ren = NULL; // current selected ren
 
-         if (cur_state) {
-             ren = Renderable::get(cur_state->tokens[1]);
+      if (cur_state) {
+         ren = Renderable::get(cur_state->tokens[1]);
+      }
+
+      //  if (ren == NULL) {
+      //      return;
+      //  }
+
+      vector<Transformation> transformation_stack; // TODO
+
+      if (ren->getType() == OBJ) {
+         Object *obj = dynamic_cast<Object*>(ren);
+         const vector<Transformation>& overall_trans =
+             obj->getOverallTransformation();
+         for (int i = overall_trans.size() - 1; i >= 0; i--) {
+             transformation_stack.push_back(overall_trans.at(i));
          }
 
-         if (ren == NULL) {
-             return;
-         }
-
-         if (ren->getType() == OBJ) {
-             Object *obj = dynamic_cast<Object*>(ren);
-             const vector<Transformation>& overall_trans =
-                 obj->getOverallTransformation();
-             for (int i = overall_trans.size() - 1; i >= 0; i--) {
-                 transformation_stack.push_back(overall_trans.at(i));
+         // Iterating over tree
+         bool IO_result = false;
+         for (auto& child_it : obj->getChildren()) {
+             const vector<Transformation>& child_trans =
+                 child_it.second.transformations;
+             for (int i = child_trans.size() - 1; i >= 0; i--) {
+                 transformation_stack.push_back(child_trans.at(i));
              }
-
-             // Iterating over tree
-             bool IO_result = false;
-             for (auto& child_it : obj->getChildren()) {
-                 const vector<Transformation>& child_trans =
-                     child_it.second.transformations;
-                 for (int i = child_trans.size() - 1; i >= 0; i--) {
-                     transformation_stack.push_back(child_trans.at(i));
-                 }
-                 IO_result |= IOTest(
-                     Renderable::get(child_it.second.name),
-                     transformation_stack,
-                     x, y, z);
-                 transformation_stack.erase(
-                     transformation_stack.end() - child_trans.size(),
-                     transformation_stack.end());
-             }
-
+            //  IO_result |= IOTest(
+            //      Renderable::get(child_it.second.name),
+            //      transformation_stack,
+            //      x, y, z);
              transformation_stack.erase(
-                 transformation_stack.end() - overall_trans.size(),
+                 transformation_stack.end() - child_trans.size(),
                  transformation_stack.end());
-         } else {
-             fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
-                 ren->getType());
-             exit(1);
          }
 
-        Ray intersection_ray;
-        intersection_ray.origin_x = 0.0;
-        intersection_ray.origin_y = 1.0;
-        intersection_ray.origin_z = 0.0;
-        intersection_ray.direction_x = 1.0;
-        intersection_ray.direction_y = 0.0;
-        intersection_ray.direction_z = 0.0;
+         transformation_stack.erase(
+             transformation_stack.end() - overall_trans.size(),
+             transformation_stack.end());
+      } else {
+         fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
+             ren->getType());
+         exit(1);
+      }
 
-        return intersection_ray;
+      Ray intersection_ray;
+      intersection_ray.origin_x = 0.0;
+      intersection_ray.origin_y = 1.0;
+      intersection_ray.origin_z = 0.0;
+      intersection_ray.direction_x = 1.0;
+      intersection_ray.direction_y = 0.0;
+      intersection_ray.direction_z = 0.0;
+
+      return intersection_ray;
     }
 
     void drawIntersectTest(Camera *camera) {

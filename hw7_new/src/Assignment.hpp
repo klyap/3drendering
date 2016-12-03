@@ -9,6 +9,7 @@ class Scene;
 
 namespace Assignment {
     Matrix4f makeTransform(Transformation t);
+    Matrixfd makeRotation(Vector4f unit_q);
     int sq_io(float x, float y, float z, float e, float n);
     void drawIOTest();
     void drawIntersectTest(Camera *camera);

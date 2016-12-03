@@ -26,7 +26,7 @@ namespace Assignment {
     Matrix4f makeRotation(Vector4f unit_q){
       // Convert to unit quarternion
 
-      Vector4f unit_q = unit_q.normalized();
+      unit_q = unit_q.normalized();
       cout << "rotation normalized: " << unit_q << endl;
       float qs = unit_q[0];
       float qx = unit_q[1];
@@ -272,7 +272,7 @@ namespace Assignment {
          }
 
          // Iterating over tree
-         bool IO_result = false;
+         //bool IO_result = false;
          for (auto& child_it : obj->getChildren()) {
              const vector<Transformation>& child_trans =
                  child_it.second.transformations;

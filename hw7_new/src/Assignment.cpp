@@ -118,6 +118,7 @@ namespace Assignment {
         float y,
         float z)
     {
+        bool IO_result = false;
         if (ren->getType() == PRM) {
             Primitive *prm = dynamic_cast<Primitive*>(ren);
 
@@ -165,7 +166,7 @@ namespace Assignment {
             }
 
             // Iterating over tree
-            bool IO_result = false;
+            //bool IO_result = false;
             for (auto& child_it : obj->getChildren()) {
                 const vector<Transformation>& child_trans =
                     child_it.second.transformations;
@@ -190,7 +191,7 @@ namespace Assignment {
             exit(1);
         }
 
-        return true;
+        return IO_result;
     }
 
 
@@ -415,25 +416,26 @@ namespace Assignment {
           degToRad(camera->getAngle()));
 
 
-        cout << "-------------------------" << endl;
-        cout << camera->getAxis()[0] << "  " <<
-          camera->getAxis()[1] << "  " << camera->getAxis()[2] << "  " <<
-          camera->getAngle() << endl;
+        // cout << "-------------------------" << endl;
+        // cout << camera->getAxis()[0] << "  " <<
+        //   camera->getAxis()[1] << "  " << camera->getAxis()[2] << "  " <<
+        //   camera->getAngle() << endl;
         Matrix4f cam_rotation_matrix;
         cam_rotation_matrix <<
           matrix[0], matrix[1], matrix[2], matrix[3],
           matrix[4], matrix[5], matrix[6], matrix[7],
           matrix[8], matrix[9], matrix[10], matrix[11],
-          matrix[12], matrix[13], matrix[14], 8;
+          matrix[12], matrix[13], matrix[14], matrix[15];
+        //cout << "cam_rotation_matrix: " << cam_rotation_matrix << endl;
 
-        for (int i = 0; i < 16; i++){
-          cout << matrix[i] << " ";
-          if (i % 4 == 3){
-             cout << endl;
-          }
-        }
+        // for (int i = 0; i < 16; i++){
+        //   cout << matrix[i] << " ";
+        //   if (i % 4 == 3){
+        //      cout << endl;
+        //   }
+        // }
         Vector4f cam_ori = Vector4f(0, 0, -1, 1);
-        cout << "cam_rotation_matrix: " << cam_rotation_matrix << endl;
+
         Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
 
         Ray camera_ray;

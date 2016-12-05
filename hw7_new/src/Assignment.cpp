@@ -131,7 +131,6 @@ namespace Assignment {
              **/
 
              Vector4f coords(x, y, z, 1);
-             cout << "original coords = " << coords << endl;
              Vector3f ini_scale_coords = prm->getCoeff();
 
              Transformation ini_scale =
@@ -140,16 +139,14 @@ namespace Assignment {
              coords = coords.transpose() * transform;
              cout << "coords after init scale: " << coords << endl;
 
-             //for (auto &t : transformation_stack){
              for (int i = 0; i < transformation_stack.size(); i++){
                Matrix4f transform = makeTransform(transformation_stack.at(i));
                coords = coords.transpose() * transform;
-               cout << "new coords: " << coords << endl;
              }
 
              // Do in/out test
-             //coords.normalize();
-             int check_inside = sq_io(coords[0], coords[1], coords[2], prm->getExp0(), prm->getExp1());
+             int check_inside = sq_io(coords[0], coords[1], coords[2],
+               prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
              if (check_inside == -1){
                cout << "check inside == -1" << endl;
@@ -275,7 +272,7 @@ namespace Assignment {
     }
 
     // Finds final t based on tplus and tminus conditions
-    Vector3f newton(Vector3f av, Vector3f bv, float e, float n){
+    pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
 
       float a = av.dot(av);
       float b = 2 * av.dot(bv);
@@ -284,13 +281,19 @@ namespace Assignment {
       float tminus = getTminus(a, b, c);
       float tplus = getTplus(a, b, c);
       float d =  b*b - 4*a*c; // discriminant
+      float t_chosen = 0;
+      Vector3f ray = Vector3f(0,0,0);
 
       if (d < 0){
-        return Vector3f(0,0,0);
+        return make_pair(t_chosen, Vector3f(0,0,0));
       } else if (tminus == tplus){
-        return getRay(iter_newton(tminus, av, bv, e, n), av, bv);
+        t_chosen = tminus;
+        return make_pair(t_chosen,
+          getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
-        return getRay(iter_newton(tminus, av, bv, e, n), av, bv);
+        t_chosen = tminus;
+        return make_pair(t_chosen,
+          getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus * tplus < 0) { // they're of opposite signs
           float actual_tminus = iter_newton(tminus, av, bv, e, n);
           float actual_tplus = iter_newton(tplus, av, bv, e, n);
@@ -300,20 +303,22 @@ namespace Assignment {
 
           if (test_minus + test_plus == 0){
             // Different signs
-            return getRay(actual_tminus, av, bv);
+            t_chosen = actual_tminus;
+            return make_pair(t_chosen, getRay(actual_tminus, av, bv));
           } else if (test_minus + test_plus > 0){
             // They're both positive
-            return getRay(min(actual_tminus, actual_tplus), av, bv);
+            t_chosen = min(actual_tminus, actual_tplus);
+            return make_pair(t_chosen, getRay(t_chosen, av, bv));
           } else {
             // They're both negative
-            return Vector3f(0,0,0);
+            return make_pair(t_chosen, ray);
           }
       }
       // else {
       //   // t+ and t- are both negative
       //   return Vector3f(0,0,0);
       // }
-      return Vector3f(0,0,0);
+      return make_pair(t_chosen, ray); // should default to Vector3f(0,0,0)
     }
 
     // Gets final t
@@ -331,42 +336,61 @@ namespace Assignment {
       return t;
     }
 
-    // void recurse_findIntersection(float t, Vector3f ray, Renderable *ren,
-    // vector<Transformation> &transformation_stack){
-    //
-    //   if (ren->getType() == OBJ) {
-    //      Object *obj = dynamic_cast<Object*>(ren);
-    //      const vector<Transformation>& overall_trans =
-    //          obj->getOverallTransformation();
-    //      for (int i = overall_trans.size() - 1; i >= 0; i--) {
-    //          transformation_stack.push_back(overall_trans.at(i));
-    //      }
-    //      // Iterating over tree
-    //      //bool IO_result = false;
-    //      for (auto& child_it : obj->getChildren()) {
-    //          const vector<Transformation>& child_trans =
-    //              child_it.second.transformations;
-    //          for (int i = child_trans.size() - 1; i >= 0; i--) {
-    //              transformation_stack.push_back(child_trans.at(i));
-    //          }
-    //           findIntersection(
-    //              Renderable::get(child_it.second.name),
-    //              transformation_stack,
-    //              x, y, z);
-    //          transformation_stack.erase(
-    //              transformation_stack.end() - child_trans.size(),
-    //              transformation_stack.end());
-    //      }
-    //
-    //      transformation_stack.erase(
-    //          transformation_stack.end() - overall_trans.size(),
-    //          transformation_stack.end());
-    //   } else {
-    //      fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
-    //          ren->getType());
-    //      exit(1);
-    //   }
-    // }
+    void recurse_findIntersection(float &t, Vector3f &ray, Renderable *ren,
+    vector<Transformation> &transformation_stack){
+
+      if (ren->getType() == PRM) {
+        // Got to "leaf" of recursion; do stuff here
+        Primitive *prm = dynamic_cast<Primitive*>(ren);
+
+        pair<float, Vector3f> new_ray_t = newton(av, bv, prm->getExp0(), prm->getExp1());
+        float new_t = new_ray_t.first;
+        Vector3f new_ray = new_ray_t.second;
+
+        // "Return": Set t and ray
+        t = min(t, new_t);
+
+        if (t == new_t){
+          ray = new_ray;
+        }
+
+
+      } else if (ren->getType() == OBJ) {
+        // Iterate over children until you get to a primitive
+         Object *obj = dynamic_cast<Object*>(ren);
+         const vector<Transformation>& overall_trans =
+             obj->getOverallTransformation();
+         for (int i = overall_trans.size() - 1; i >= 0; i--) {
+             transformation_stack.push_back(overall_trans.at(i));
+         }
+
+         // Iterating over tree
+         for (auto& child_it : obj->getChildren()) {
+             const vector<Transformation>& child_trans =
+                 child_it.second.transformations;
+             for (int i = child_trans.size() - 1; i >= 0; i--) {
+                 transformation_stack.push_back(child_trans.at(i));
+             }
+             // Updates referenced t and ray with min + t
+             // and the associated Vec3f
+              recurse_findIntersection(t, ray,
+                 Renderable::get(child_it.second.name),
+                 transformation_stack,
+                 x, y, z);
+             transformation_stack.erase(
+                 transformation_stack.end() - child_trans.size(),
+                 transformation_stack.end());
+         }
+
+         transformation_stack.erase(
+             transformation_stack.end() - overall_trans.size(),
+             transformation_stack.end());
+      } else {
+         fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
+             ren->getType());
+         exit(1);
+      }
+    }
 
     Ray findIntersection(const Ray &camera_ray) {
       /* TODO
@@ -399,7 +423,11 @@ namespace Assignment {
            return intersection_ray;
        }
 
-      //vector<Transformation> transformation_stack;
+      // the "return" values
+      vector<Transformation> transformation_stack;
+      float t;
+      Vector3f ray;
+      recurse_findIntersection(t, ray, ren, transformation_stack);
 
       return intersection_ray;
     }
@@ -435,7 +463,6 @@ namespace Assignment {
         //   }
         // }
         Vector4f cam_ori = Vector4f(0, 0, -1, 1);
-
         Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
 
         Ray camera_ray;

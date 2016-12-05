@@ -414,7 +414,11 @@ namespace Assignment {
           camera->getAxis()[1], camera->getAxis()[2],
           degToRad(camera->getAngle()));
 
+
         cout << "-------------------------" << endl;
+        cout << camera->getAxis()[0] << "  " <<
+          camera->getAxis()[1] << "  " << camera->getAxis()[2] << "  " << 
+          degToRad(camera->getAngle()) << endl;
         Matrix4f cam_rotation_matrix;
         cam_rotation_matrix <<
           matrix[0], matrix[1], matrix[2], matrix[3],

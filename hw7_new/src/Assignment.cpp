@@ -409,7 +409,7 @@ namespace Assignment {
         //   camera->getAxis()[1], camera->getAxis()[2],
         //   camera->getAngle());
 
-        float *matrix[16];
+        float matrix[16];
         makeRotateMat(matrix, camera->getAxis()[0],
           camera->getAxis()[1], camera->getAxis()[2],
           camera->getAngle());

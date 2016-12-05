@@ -23,7 +23,7 @@ namespace Assignment {
     static const int k_io_test_z_count = 15;
 
     // BEGIN -----------------------------------------------
-    Matrix4f makeRotation(Vector4f unit_q){
+    Matrix4f makeRotationQuat(Vector4f unit_q){
       // Convert to unit quarternion
       cout << "ini rotation quarternion: " << unit_q << endl;
       unit_q = unit_q.normalized();
@@ -78,7 +78,7 @@ namespace Assignment {
         // Convert to normal axes and invert
         cout << "Transform scale: rotate " << type << endl;
         //makeRotateMat(float *matrix, float x, float y, float z, float angle);
-        transform = makeRotation(t.trans);
+        transform = makeRotationQuat(t.trans);
       }
 
       cout << transform << endl;
@@ -259,6 +259,8 @@ namespace Assignment {
         }
     };
 
+
+
     float getTplus(float a, float b, float c) {
       return 2 * c / (-b - sqrt(b*b - 4*a*c));
     }
@@ -285,12 +287,12 @@ namespace Assignment {
       if (d < 0){
         return Vector3f(0,0,0);
       } else if (tminus == tplus){
-        return getRay(iter_newton(tminus, av, bv), av, bv);
+        return getRay(iter_newton(tminus, av, bv, e, n), av, bv);
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
-        return getRay(iter_newton(tminus, av, bv), av, bv);
+        return getRay(iter_newton(tminus, av, bv, e, n), av, bv);
       } else if (tminus * tplus < 0) { // they're of opposite signs
-          float actual_tminus = iter_newton(tminus, av, bv);
-          float actual_tplus = iter_newton(tplus, av, bv);
+          float actual_tminus = iter_newton(tminus, av, bv, e, n);
+          float actual_tplus = iter_newton(tplus, av, bv, e, n);
 
           int test_minus = sign(actual_tminus);
           int test_plus = sign(actual_tplus);
@@ -305,7 +307,7 @@ namespace Assignment {
             // They're both negative
             return Vector3f(0,0,0);
           }
-      } 
+      }
       // else {
       //   // t+ and t- are both negative
       //   return Vector3f(0,0,0);
@@ -316,11 +318,11 @@ namespace Assignment {
     // Gets final t
     float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
       Vector3f rayt = getRay(t, av, bv);
-      float gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
+      float gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
 
       while (-1/20 >= g && g >= 1/20 && gprime < 0){ // stopping condition
-        gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
+        gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
 
         t = t - g/gprime;
@@ -377,15 +379,12 @@ namespace Assignment {
       intersection_ray.direction_y = 0.0;
       intersection_ray.direction_z = 0.0;
 
-      Vector4f cam_rotation = Vector4f(camera_ray.getAxis()[0],
-        camera_ray.getAxis()[1], camera_ray.getAxis()[2],
-        camera_ray.getAngle());
-      Vector4f cam_ori = Vector4f(0, 0, -1, 1);
-      Vector4f cam_dir = cam_ori * makeRotateMat(cam_rotation);
-
+      // Direction camera is pointing
       Vector3f av = Vector3f(
-        cam_dir[0], cam_dir[1], cam_dir[2]); // Direction camera is pointing
-      Vector3f bv = camera_ray.getPosition(); // Position of camera
+          camera_ray.direction_x, camera_ray.direction_y, camera_ray.direction_z);;
+      // Position of camera
+      Vector3f bv = Vector3f(
+        camera_ray.origin_x, camera_ray.origin_y, camera_ray.origin_z);
 
       // Prep for recursing over tree
       const Line* cur_state = CommandLine::getState();
@@ -399,19 +398,34 @@ namespace Assignment {
            return intersection_ray;
        }
 
-      vector<Transformation> transformation_stack;
+      //vector<Transformation> transformation_stack;
 
       return intersection_ray;
     }
 
     void drawIntersectTest(Camera *camera) {
+
+        // Vector4f cam_rotation = Vector4f(camera.getAxis()[0],
+        //   camera.getAxis()[1], camera.getAxis()[2],
+        //   camera.getAngle());
+
+        float *matrix[16];
+        makeRotateMat(matrix, camera.getAxis()[0],
+          camera.getAxis()[1], camera.getAxis()[2],
+          camera.getAngle());
+        Matrix4f cam_rotation_matrix = Matrix4f(matrix);
+
+        Vector4f cam_ori = Vector4f(0, 0, -1, 1);
+        cout << "cam_rotation_matrix: " << cam_rotation_matrix << endl;
+        Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
+
         Ray camera_ray;
-        camera_ray.origin_x = 0.0;      // TODO: replace 0.0 with correct value
-        camera_ray.origin_y = 0.0;      // TODO: replace 0.0 with correct value
-        camera_ray.origin_z = 0.0;      // TODO: replace 0.0 with correct value
-        camera_ray.direction_x = 0.0;   // TODO: replace 0.0 with correct value
-        camera_ray.direction_y = 0.0;   // TODO: replace 0.0 with correct value
-        camera_ray.direction_z = 0.0;   // TODO: replace 0.0 with correct value
+        camera_ray.origin_x = camera.getPosition()[0];
+        camera_ray.origin_y = camera.getPosition()[1];
+        camera_ray.origin_z = camera.getPosition()[2];
+        camera_ray.direction_x = cam_dir[0];
+        camera_ray.direction_y = cam_dir[1];
+        camera_ray.direction_z = cam_dir[2];
 
         Ray intersection_ray = findIntersection(camera_ray);
 

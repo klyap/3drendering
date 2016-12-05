@@ -57,7 +57,7 @@ void makeRotateMat(float *matrix, float x, float y, float z, float angle) {
     x = x / length;
     y = y / length;
     z = z / length;
-    
+
     // Set the matrix's values
     float sin_a = sinf(angle);
     float cos_a = cosf(angle);

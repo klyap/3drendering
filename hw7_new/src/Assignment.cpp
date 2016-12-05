@@ -405,24 +405,29 @@ namespace Assignment {
 
     void drawIntersectTest(Camera *camera) {
 
-        // Vector4f cam_rotation = Vector4f(camera.getAxis()[0],
-        //   camera.getAxis()[1], camera.getAxis()[2],
-        //   camera.getAngle());
+        // Vector4f cam_rotation = Vector4f(camera->getAxis()[0],
+        //   camera->getAxis()[1], camera->getAxis()[2],
+        //   camera->getAngle());
 
         float *matrix[16];
-        makeRotateMat(matrix, camera.getAxis()[0],
-          camera.getAxis()[1], camera.getAxis()[2],
-          camera.getAngle());
-        Matrix4f cam_rotation_matrix = Matrix4f(matrix);
+        makeRotateMat(matrix, camera->getAxis()[0],
+          camera->getAxis()[1], camera->getAxis()[2],
+          camera->getAngle());
+        Matrix4f cam_rotation_matrix(4,4);
+        cam_rotation_matrix <<
+          matrix[0], matrix[1], matrix[2], matrix[3],
+          matrix[4], matrix[5], matrix[6], matrix[7],
+          matrix[8], matrix[9], matrix[10], matrix[11],
+          matrix[12], matrix[13], matrix[14], matrix[15];
 
         Vector4f cam_ori = Vector4f(0, 0, -1, 1);
         cout << "cam_rotation_matrix: " << cam_rotation_matrix << endl;
         Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
 
         Ray camera_ray;
-        camera_ray.origin_x = camera.getPosition()[0];
-        camera_ray.origin_y = camera.getPosition()[1];
-        camera_ray.origin_z = camera.getPosition()[2];
+        camera_ray.origin_x = camera->getPosition()[0];
+        camera_ray.origin_y = camera->getPosition()[1];
+        camera_ray.origin_z = camera->getPosition()[2];
         camera_ray.direction_x = cam_dir[0];
         camera_ray.direction_y = cam_dir[1];
         camera_ray.direction_z = cam_dir[2];

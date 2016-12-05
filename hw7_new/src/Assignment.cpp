@@ -420,7 +420,7 @@ namespace Assignment {
           matrix[0], matrix[1], matrix[2], matrix[3],
           matrix[4], matrix[5], matrix[6], matrix[7],
           matrix[8], matrix[9], matrix[10], matrix[11],
-          matrix[12], matrix[13], matrix[14], matrix[15];
+          matrix[12], matrix[13], matrix[14], 8;
 
         for (int i = 0; i < 16; i++){
           cout << matrix[i] << " ";

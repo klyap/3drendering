@@ -412,7 +412,7 @@ namespace Assignment {
         float matrix[16];
         makeRotateMat(matrix, camera->getAxis()[0],
           camera->getAxis()[1], camera->getAxis()[2],
-          camera->getAngle());
+          degToRad(camera->getAngle()));
         Matrix4f cam_rotation_matrix(4,4);
         cam_rotation_matrix <<
           matrix[0], matrix[1], matrix[2], matrix[3],

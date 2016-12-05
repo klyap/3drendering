@@ -150,7 +150,6 @@ namespace Assignment {
              //coords.normalize();
              int check_inside = sq_io(coords[0], coords[1], coords[2], prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
-             cout << "it is true: " << check_inside == -1 << endl;
              if (check_inside == -1){
                cout << "check inside == -1" << endl;
                return true;
@@ -273,7 +272,7 @@ namespace Assignment {
     }
 
     // Finds final t based on tplus and tminus conditions
-    Vector3f newton(Vector3f av, Vector3f bv){
+    Vector3f newton(Vector3f av, Vector3f bv, float e, float n){
 
       float a = av.dot(av);
       float b = 2 * av.dot(bv);
@@ -286,12 +285,12 @@ namespace Assignment {
       if (d < 0){
         return Vector3f(0,0,0);
       } else if (tminus == tplus){
-        return getRay(iter_newton(tminus), av, bv);
+        return getRay(iter_newton(tminus, av, bv), av, bv);
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
-        return getRay(iter_newton(tminus), av, bv);
+        return getRay(iter_newton(tminus, av, bv), av, bv);
       } else if (tminus * tplus < 0) { // they're of opposite signs
-          float actual_tminus = iter_newton(tminus);
-          float actual_tplus = iter_newton(tplus);
+          float actual_tminus = iter_newton(tminus, av, bv);
+          float actual_tplus = iter_newton(tplus, av, bv);
 
           int test_minus = sign(actual_tminus);
           int test_plus = sign(actual_tplus);
@@ -314,7 +313,7 @@ namespace Assignment {
     }
 
     // Gets final t
-    Vector3f iter_newton(float t, Vector3f av, Vector3f bv){
+    float iter_newton(float t, Vector3f av, Vector3f bv){
       Vector3f rayt = getRay(t, av, bv);
       float gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
@@ -332,8 +331,8 @@ namespace Assignment {
       /* TODO
       *
       **/
-      Vector3f av = camera_ray->getAxis(); // Direction camera is pointing
-      Vector3f bv = camera_ray->getPosition(); // Position of camera
+      Vector3f av = camera_ray.getAxis(); // Direction camera is pointing
+      Vector3f bv = camera_ray.getPosition(); // Position of camera
 
       const Line* cur_state = CommandLine::getState();
       Renderable* ren = NULL; // current selected ren

@@ -152,6 +152,7 @@ namespace Assignment {
              cout << "sq_io returned: " << check_inside << endl;
              cout << "it is true: " << check_inside == -1 << endl;
              if (check_inside == -1){
+               cout << "check inside == -1" << endl;
                return true;
              }
             return false;

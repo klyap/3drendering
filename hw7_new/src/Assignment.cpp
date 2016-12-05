@@ -285,7 +285,7 @@ namespace Assignment {
       Vector3f ray = Vector3f(0,0,0);
 
       if (d < 0){
-        return make_pair(t_chosen, Vector3f(0,0,0))make_pair(t_chosen, ray);
+        return make_pair(t_chosen, Vector3f(0,0,0));
       } else if (tminus == tplus){
         t_chosen = tminus;
         return make_pair(t_chosen,
@@ -336,8 +336,10 @@ namespace Assignment {
       return t;
     }
 
-    void recurse_findIntersection(float &t, Vector3f &ray, Renderable *ren,
-    vector<Transformation> &transformation_stack){
+    void recurse_findIntersection(float &t, Vector3f &ray,
+      Vector3f av, Vector3f bv,
+      Renderable *ren,
+      vector<Transformation> &transformation_stack){
 
       if (ren->getType() == PRM) {
         // Got to "leaf" of recursion; do stuff here
@@ -374,9 +376,9 @@ namespace Assignment {
              // Updates referenced t and ray with min + t
              // and the associated Vec3f
               recurse_findIntersection(t, ray,
-                 Renderable::get(child_it.second.name),
-                 transformation_stack,
-                 x, y, z);
+               av, bv,
+               Renderable::get(child_it.second.name),
+               transformation_stack);
              transformation_stack.erase(
                  transformation_stack.end() - child_trans.size(),
                  transformation_stack.end());
@@ -427,7 +429,7 @@ namespace Assignment {
       vector<Transformation> transformation_stack;
       float t;
       Vector3f ray;
-      recurse_findIntersection(t, ray, ren, transformation_stack);
+      recurse_findIntersection(t, ray, av, bv, ren, transformation_stack);
 
       return intersection_ray;
     }

@@ -17,8 +17,9 @@ namespace Assignment {
     Vector3f getRay(float t, Vector3f av, Vector3f bv);
     float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n);
     pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n);
-    void recurse_findIntersection(float &t, Vector3f &ray, Renderable *ren,
-    vector<Transformation> &transformation_stack);
+    void recurse_findIntersection(float &t, Vector3f &ray,
+      Vector3f av, Vector3f bv, Renderable *ren,
+      vector<Transformation> &transformation_stack);
 
     void drawIOTest();
     void drawIntersectTest(Camera *camera);

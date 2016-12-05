@@ -268,15 +268,18 @@ namespace Assignment {
     }
 
     Vector3f getRay(float t, Vector3f av, Vector3f bv){
+      cout << "Got ray: " << av * t + bv << endl;
       return av * t + bv;
     }
 
     // Finds final t based on tplus and tminus conditions
     pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
-
+      cout << "== newton == "<< endl;
       float a = av.dot(av);
       float b = 2 * av.dot(bv);
       float c = bv.dot(bv) - 3;
+
+      cout << "== abc: " << a << " " << b << " " << c << endl;
 
       float tminus = getTminus(a, b, c);
       float tplus = getTplus(a, b, c);
@@ -285,16 +288,20 @@ namespace Assignment {
       Vector3f ray = Vector3f(0,0,0);
 
       if (d < 0){
+        cout << "== d < 0 ==" << d << endl;
         return make_pair(t_chosen, Vector3f(0,0,0));
       } else if (tminus == tplus){
+        cout << "== equal ==" << endl;
         t_chosen = tminus;
         return make_pair(t_chosen,
           getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
+        cout << "== both + ==" << endl;
         t_chosen = tminus;
         return make_pair(t_chosen,
           getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus * tplus < 0) { // they're of opposite signs
+          cout << "== opposite signs ==" << endl;
           float actual_tminus = iter_newton(tminus, av, bv, e, n);
           float actual_tplus = iter_newton(tplus, av, bv, e, n);
 
@@ -318,14 +325,17 @@ namespace Assignment {
       //   // t+ and t- are both negative
       //   return Vector3f(0,0,0);
       // }
+      cout << "== newton didn't go into any tests ==" << endl;
       return make_pair(t_chosen, ray); // should default to Vector3f(0,0,0)
     }
 
     // Gets final t
     float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
+      cout << "== Iter newton ==" << endl;
       Vector3f rayt = getRay(t, av, bv);
       float gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
+      cout << "==g prime: " << gprime << " g: " << g << endl;
 
       while (-1/20 >= g && g >= 1/20 && gprime < 0){ // stopping condition
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
@@ -333,6 +343,8 @@ namespace Assignment {
 
         t = t - g/gprime;
       }
+      cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
+      cout << "==FINAL t: " << t << endl;
       return t;
     }
 
@@ -343,21 +355,26 @@ namespace Assignment {
 
       if (ren->getType() == PRM) {
         // Got to "leaf" of recursion; do stuff here
+        cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
 
         pair<float, Vector3f> new_ray_t = newton(av, bv, prm->getExp0(), prm->getExp1());
         float new_t = new_ray_t.first;
         Vector3f new_ray = new_ray_t.second;
+        cout << "==Computed t: " << new_t << endl;
+        cout << "==Computed ray: " << new_ray << endl;
 
         // "Return": Set t and ray
+        // Choose smallest positive t
+        new_t = max(0, new_t)
         t = min(t, new_t);
 
         if (t == new_t){
           ray = new_ray;
         }
 
-
       } else if (ren->getType() == OBJ) {
+        cout << "== In obj. About to recurse == " << endl;
         // Iterate over children until you get to a primitive
          Object *obj = dynamic_cast<Object*>(ren);
          const vector<Transformation>& overall_trans =
@@ -430,6 +447,15 @@ namespace Assignment {
       float t;
       Vector3f ray;
       recurse_findIntersection(t, ray, av, bv, ren, transformation_stack);
+
+      cout << "==Computed ray: " << ray << endl;
+      // Package into Ray obj
+      intersection_ray.origin_x = ray[0];
+      intersection_ray.origin_y = ray[1];
+      intersection_ray.origin_z = ray[2];
+      intersection_ray.direction_x = 0.0;
+      intersection_ray.direction_y = 0.0;
+      intersection_ray.direction_z = -1.0;
 
       return intersection_ray;
     }

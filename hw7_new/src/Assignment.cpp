@@ -285,7 +285,7 @@ namespace Assignment {
       Vector3f ray = Vector3f(0,0,0);
 
       if (d < 0){
-        return make_pair(t_chosen, Vector3f(0,0,0));
+        return make_pair(t_chosen, Vector3f(0,0,0))make_pair(t_chosen, ray);
       } else if (tminus == tplus){
         t_chosen = tminus;
         return make_pair(t_chosen,
@@ -469,6 +469,10 @@ namespace Assignment {
         camera_ray.origin_x = camera->getPosition()[0];
         camera_ray.origin_y = camera->getPosition()[1];
         camera_ray.origin_z = camera->getPosition()[2];
+        camera_ray.direction_x = 0;
+        camera_ray.direction_y = 0;
+        camera_ray.direction_z = -1;
+
         camera_ray.direction_x = cam_dir[0];
         camera_ray.direction_y = cam_dir[1];
         camera_ray.direction_z = cam_dir[2];

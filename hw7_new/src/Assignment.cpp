@@ -305,11 +305,12 @@ namespace Assignment {
             // They're both negative
             return Vector3f(0,0,0);
           }
-      } else {
-        // t+ and t- are both negative
-        return Vector3f(0,0,0);
-      }
-
+      } 
+      // else {
+      //   // t+ and t- are both negative
+      //   return Vector3f(0,0,0);
+      // }
+      return Vector3f(0,0,0);
     }
 
     // Gets final t

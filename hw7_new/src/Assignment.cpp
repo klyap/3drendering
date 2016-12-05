@@ -366,7 +366,7 @@ namespace Assignment {
 
         // "Return": Set t and ray
         // Choose smallest positive t
-        new_t = fmax(0.0, new_t)
+        new_t = fmax(0.0, new_t);
         t = min(t, new_t);
 
         if (t == new_t){

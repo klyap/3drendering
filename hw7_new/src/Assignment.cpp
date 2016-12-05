@@ -150,6 +150,7 @@ namespace Assignment {
              //coords.normalize();
              int check_inside = sq_io(coords[0], coords[1], coords[2], prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
+             cout << "it is true: " << check_inside == -1 << endl;
              if (check_inside == -1){
                return true;
              }

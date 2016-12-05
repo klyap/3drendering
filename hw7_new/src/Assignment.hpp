@@ -15,8 +15,8 @@ namespace Assignment {
     float getTplus(float a, float b, float c);
     Vector3f grad_sq_io(float x, float y, float z, float e, float n);
     Vector3f getRay(float t, Vector3f av, Vector3f bv);
-    float iter_newton(float t, Vector3f av, Vector3f bv);
-    Vector3f newton(Vector3f av, Vector3f bv);
+    float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n);
+    Vector3f newton(Vector3f av, Vector3f bv, float e, float n);
     void drawIOTest();
     void drawIntersectTest(Camera *camera);
     void raytrace(Camera camera, Scene scene);

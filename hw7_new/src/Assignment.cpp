@@ -313,7 +313,7 @@ namespace Assignment {
     }
 
     // Gets final t
-    float iter_newton(float t, Vector3f av, Vector3f bv){
+    float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
       Vector3f rayt = getRay(t, av, bv);
       float gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
@@ -327,60 +327,47 @@ namespace Assignment {
       return t;
     }
 
+    // void recurse_findIntersection(float t, Vector3f ray, Renderable *ren,
+    // vector<Transformation> &transformation_stack){
+    //
+    //   if (ren->getType() == OBJ) {
+    //      Object *obj = dynamic_cast<Object*>(ren);
+    //      const vector<Transformation>& overall_trans =
+    //          obj->getOverallTransformation();
+    //      for (int i = overall_trans.size() - 1; i >= 0; i--) {
+    //          transformation_stack.push_back(overall_trans.at(i));
+    //      }
+    //      // Iterating over tree
+    //      //bool IO_result = false;
+    //      for (auto& child_it : obj->getChildren()) {
+    //          const vector<Transformation>& child_trans =
+    //              child_it.second.transformations;
+    //          for (int i = child_trans.size() - 1; i >= 0; i--) {
+    //              transformation_stack.push_back(child_trans.at(i));
+    //          }
+    //           findIntersection(
+    //              Renderable::get(child_it.second.name),
+    //              transformation_stack,
+    //              x, y, z);
+    //          transformation_stack.erase(
+    //              transformation_stack.end() - child_trans.size(),
+    //              transformation_stack.end());
+    //      }
+    //
+    //      transformation_stack.erase(
+    //          transformation_stack.end() - overall_trans.size(),
+    //          transformation_stack.end());
+    //   } else {
+    //      fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
+    //          ren->getType());
+    //      exit(1);
+    //   }
+    // }
+
     Ray findIntersection(const Ray &camera_ray) {
       /* TODO
       *
       **/
-      Vector3f av = camera_ray.getAxis(); // Direction camera is pointing
-      Vector3f bv = camera_ray.getPosition(); // Position of camera
-
-      const Line* cur_state = CommandLine::getState();
-      Renderable* ren = NULL; // current selected ren
-
-      if (cur_state) {
-         ren = Renderable::get(cur_state->tokens[1]);
-      }
-
-      //  if (ren == NULL) {
-      //      return;
-      //  }
-
-      vector<Transformation> transformation_stack; // TODO
-
-      if (ren->getType() == OBJ) {
-         Object *obj = dynamic_cast<Object*>(ren);
-         const vector<Transformation>& overall_trans =
-             obj->getOverallTransformation();
-         for (int i = overall_trans.size() - 1; i >= 0; i--) {
-             transformation_stack.push_back(overall_trans.at(i));
-         }
-
-         // Iterating over tree
-         //bool IO_result = false;
-         for (auto& child_it : obj->getChildren()) {
-             const vector<Transformation>& child_trans =
-                 child_it.second.transformations;
-             for (int i = child_trans.size() - 1; i >= 0; i--) {
-                 transformation_stack.push_back(child_trans.at(i));
-             }
-            //  IO_result |= IOTest(
-            //      Renderable::get(child_it.second.name),
-            //      transformation_stack,
-            //      x, y, z);
-             transformation_stack.erase(
-                 transformation_stack.end() - child_trans.size(),
-                 transformation_stack.end());
-         }
-
-         transformation_stack.erase(
-             transformation_stack.end() - overall_trans.size(),
-             transformation_stack.end());
-      } else {
-         fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
-             ren->getType());
-         exit(1);
-      }
-
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;
       intersection_ray.origin_y = 1.0;
@@ -388,6 +375,30 @@ namespace Assignment {
       intersection_ray.direction_x = 1.0;
       intersection_ray.direction_y = 0.0;
       intersection_ray.direction_z = 0.0;
+
+      Vector4f cam_rotation = Vector4f(camera_ray.getAxis()[0],
+        camera_ray.getAxis()[1], camera_ray.getAxis()[2],
+        camera_ray.getAngle());
+      Vector4f cam_ori = Vector4f(0, 0, -1, 1);
+      Vector4f cam_dir = cam_ori * makeRotateMat(cam_rotation);
+
+      Vector3f av = Vector3f(
+        cam_dir[0], cam_dir[1], cam_dir[2]); // Direction camera is pointing
+      Vector3f bv = camera_ray.getPosition(); // Position of camera
+
+      // Prep for recursing over tree
+      const Line* cur_state = CommandLine::getState();
+      Renderable* ren = NULL; // current selected ren
+
+      if (cur_state) {
+         ren = Renderable::get(cur_state->tokens[1]);
+      }
+
+       if (ren == NULL) {
+           return intersection_ray;
+       }
+
+      vector<Transformation> transformation_stack;
 
       return intersection_ray;
     }

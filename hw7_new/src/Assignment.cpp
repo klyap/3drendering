@@ -77,6 +77,7 @@ namespace Assignment {
         // Given coords in quaternion
         // Convert to normal axes and invert
         cout << "Transform scale: rotate " << type << endl;
+        //makeRotateMat(float *matrix, float x, float y, float z, float angle);
         transform = makeRotation(t.trans);
       }
 
@@ -97,6 +98,15 @@ namespace Assignment {
 
       //outside object
       return 0;
+    }
+
+    //The normal at any point xyz is simply the gradient of the sq_io function
+    Vector3f grad_sq_io(float x, float y, float z, float e, float n){
+      float dx = 2 * x * pow(x * x, 1/e - 1) * pow(pow(x * x, 1/e) + pow(y * y, 1/e), e/n-1);
+      float dy = 2 * y * pow(y * y, 1/e - 1) * pow(pow(x * x, 1/e) + pow(y * y, 1/e), e/n-1);
+      float dz = (2 * z * pow(z * z, 1/n - 1))/ n;
+
+      return Vector3f(dx, dy, dz);
     }
 
 //----------------------------------------------------------------------------
@@ -248,57 +258,127 @@ namespace Assignment {
         }
     };
 
+    float getTplus(float a, float b, float c) {
+      return 2 * c / (-b - sqrt(b*b - 4*a*c));
+    }
+
+    float getTminus(float a, float b, float c) {
+      return (-b - sqrt(b*b - 4*a*c)) / (2 * a);
+    }
+
+    Vector3f getRay(float t, Vector3f av, Vector3f bv){
+      return av * t + bv;
+    }
+
+    // Finds final t based on tplus and tminus conditions
+    Vector3f newton(Vector3f av, Vector3f bv){
+
+      float a = av.dot(av);
+      float b = 2 * av.dot(bv);
+      float c = bv.dot(bv) - 3;
+
+      float tminus = getTminus(a, b, c);
+      float tplus = getTplus(a, b, c);
+      float d =  b*b - 4*a*c; // discriminant
+
+      if (d < 0){
+        return Vector3f(0,0,0);
+      } else if (tminus == tplus){
+        return getRay(iter_newton(tminus), av, bv);
+      } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
+        return getRay(iter_newton(tminus), av, bv);
+      } else if (tminus * tplus < 0) { // they're of opposite signs
+          float actual_tminus = iter_newton(tminus);
+          float actual_tplus = iter_newton(tplus);
+
+          int test_minus = sign(actual_tminus);
+          int test_plus = sign(actual_tplus);
+
+          if (test_minus + test_plus == 0){
+            // Different signs
+            return getRay(actual_tminus, av, bv);
+          } else if (test_minus + test_plus > 0){
+            // They're both positive
+            return getRay(min(actual_tminus, actual_tplus), av, bv);
+          } else {
+            // They're both negative
+            return Vector3f(0,0,0);
+          }
+      } else {
+        // t+ and t- are both negative
+        return Vector3f(0,0,0);
+      }
+
+    }
+
+    // Gets final t
+    Vector3f iter_newton(float t, Vector3f av, Vector3f bv){
+      Vector3f rayt = getRay(t, av, bv);
+      float gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
+      float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
+
+      while (-1/20 >= g && g >= 1/20 && gprime < 0){ // stopping condition
+        gprime = av * grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
+        g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
+
+        t = t - g/gprime;
+      }
+      return t;
+    }
+
     Ray findIntersection(const Ray &camera_ray) {
       /* TODO
       *
       **/
+      Vector3f av = camera_ray->getAxis(); // Direction camera is pointing
+      Vector3f bv = camera_ray->getPosition(); // Position of camera
 
-      // const Line* cur_state = CommandLine::getState();
-      // Renderable* ren = NULL; // current selected ren
-      //
-      // if (cur_state) {
-      //    ren = Renderable::get(cur_state->tokens[1]);
-      // }
-      //
-      // //  if (ren == NULL) {
-      // //      return;
-      // //  }
-      //
-      // vector<Transformation> transformation_stack; // TODO
-      //
-      // if (ren->getType() == OBJ) {
-      //    Object *obj = dynamic_cast<Object*>(ren);
-      //    const vector<Transformation>& overall_trans =
-      //        obj->getOverallTransformation();
-      //    for (int i = overall_trans.size() - 1; i >= 0; i--) {
-      //        transformation_stack.push_back(overall_trans.at(i));
-      //    }
-      //
-      //    // Iterating over tree
-      //    //bool IO_result = false;
-      //    for (auto& child_it : obj->getChildren()) {
-      //        const vector<Transformation>& child_trans =
-      //            child_it.second.transformations;
-      //        for (int i = child_trans.size() - 1; i >= 0; i--) {
-      //            transformation_stack.push_back(child_trans.at(i));
-      //        }
-      //       //  IO_result |= IOTest(
-      //       //      Renderable::get(child_it.second.name),
-      //       //      transformation_stack,
-      //       //      x, y, z);
-      //        transformation_stack.erase(
-      //            transformation_stack.end() - child_trans.size(),
-      //            transformation_stack.end());
-      //    }
-      //
-      //    transformation_stack.erase(
-      //        transformation_stack.end() - overall_trans.size(),
-      //        transformation_stack.end());
-      // } else {
-      //    fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
-      //        ren->getType());
-      //    exit(1);
-      // }
+      const Line* cur_state = CommandLine::getState();
+      Renderable* ren = NULL; // current selected ren
+
+      if (cur_state) {
+         ren = Renderable::get(cur_state->tokens[1]);
+      }
+
+      //  if (ren == NULL) {
+      //      return;
+      //  }
+
+      vector<Transformation> transformation_stack; // TODO
+
+      if (ren->getType() == OBJ) {
+         Object *obj = dynamic_cast<Object*>(ren);
+         const vector<Transformation>& overall_trans =
+             obj->getOverallTransformation();
+         for (int i = overall_trans.size() - 1; i >= 0; i--) {
+             transformation_stack.push_back(overall_trans.at(i));
+         }
+
+         // Iterating over tree
+         //bool IO_result = false;
+         for (auto& child_it : obj->getChildren()) {
+             const vector<Transformation>& child_trans =
+                 child_it.second.transformations;
+             for (int i = child_trans.size() - 1; i >= 0; i--) {
+                 transformation_stack.push_back(child_trans.at(i));
+             }
+            //  IO_result |= IOTest(
+            //      Renderable::get(child_it.second.name),
+            //      transformation_stack,
+            //      x, y, z);
+             transformation_stack.erase(
+                 transformation_stack.end() - child_trans.size(),
+                 transformation_stack.end());
+         }
+
+         transformation_stack.erase(
+             transformation_stack.end() - overall_trans.size(),
+             transformation_stack.end());
+      } else {
+         fprintf(stderr, "Renderer::draw ERROR invalid RenderableType %d\n",
+             ren->getType());
+         exit(1);
+      }
 
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;

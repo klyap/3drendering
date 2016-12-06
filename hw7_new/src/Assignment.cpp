@@ -374,6 +374,7 @@ namespace Assignment {
         Transformation ini_scale =
            Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
         Matrix4f transform = makeTransform(ini_scale);
+        Vector4f ray4(ray[0],ray[1],ray[2],1);
         ray = ray.transpose() * transform;
         cout << "ray origin after init scale: " << ray << endl;
 
@@ -382,7 +383,7 @@ namespace Assignment {
           ray = ray.transpose() * transform;
         }
 
-        cout << "ray origin after all transforms: " << coords << endl;
+        cout << "ray origin after all transforms: " << ray << endl;
 
         // Do computations in superquadratic space
         pair<float, Vector3f> new_ray_t =

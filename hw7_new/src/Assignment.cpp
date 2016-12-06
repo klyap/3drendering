@@ -381,8 +381,8 @@ namespace Assignment {
           ray = new_ray;
         }
 
-        cout << "==Global t: " << new_t << endl;
-        cout << "==Global ray: " << new_ray << endl;
+        cout << "==Global t: " << t << endl;
+        cout << "==Global ray: " << ray << endl;
 
       } else if (ren->getType() == OBJ) {
         cout << "== In obj. About to recurse == " << endl;
@@ -457,7 +457,7 @@ namespace Assignment {
 
       // the "return" values
       vector<Transformation> transformation_stack;
-      float t;
+      float t = 1000000000000;
       Vector3f ray;
       recurse_findIntersection(t, ray, av, bv, ren, transformation_stack);
 

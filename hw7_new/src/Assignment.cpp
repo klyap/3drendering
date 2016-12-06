@@ -92,11 +92,11 @@ namespace Assignment {
         // inside object
         return -1;
       } else if (test > 0){
-        //on surface
+        //outside object
         return 1;
       }
+      //on surface
 
-      //outside object
       return 0;
     }
 
@@ -335,13 +335,14 @@ namespace Assignment {
       Vector3f rayt = getRay(t, av, bv);
       float gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
-      cout << "==g prime: " << gprime << " g: " << g << endl;
-
+      cout << "==INIT g prime: " << gprime << " g: " << g << endl;
+      cout << "==INIT t: " << t << endl;
       while (-1/20 >= g && g >= 1/20 && gprime < 0){ // stopping condition
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
-
         t = t - g/gprime;
+        cout << "==NEW g prime: " << gprime << " g: " << g << endl;
+        cout << "==NEW t: " << t << endl;
       }
       cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
       cout << "==FINAL t: " << t << endl;

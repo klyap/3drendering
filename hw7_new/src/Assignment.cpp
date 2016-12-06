@@ -262,11 +262,11 @@ namespace Assignment {
 
 
     float getTplus(float a, float b, float c) {
-      return 2 * c / (-b - sqrt(b*b - 4*a*c));
+      return 2.0 * c / (-b - sqrt(b*b - 4*a*c));
     }
 
     float getTminus(float a, float b, float c) {
-      return (-b - sqrt(b*b - 4*a*c)) / (2 * a);
+      return (-b - sqrt(b*b - 4.0*a*c)) / (2.0 * a);
     }
 
     Vector3f getRay(float t, Vector3f av, Vector3f bv){
@@ -288,6 +288,7 @@ namespace Assignment {
       float d =  b*b - 4*a*c; // discriminant
       float t_chosen = 0;
       Vector3f ray = Vector3f(0,0,0);
+      cout << "tminus = " << tminus << " tplus = " << tplus << endl;
 
       if (d < 0){
         cout << "== d < 0 ==" << d << endl;
@@ -512,7 +513,7 @@ namespace Assignment {
 
         Ray intersection_ray = findIntersection(camera_ray);
 
-        const float IO_test_color[3] = {0.0, 0.0, 0.5};
+        const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);
         glLineWidth(3.0);
         glBegin(GL_LINES);

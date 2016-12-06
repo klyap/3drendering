@@ -356,7 +356,8 @@ namespace Assignment {
       return make_pair(t, rayt);
     }
 
-    void recurse_findIntersection(float &t, Vector3f &ray,
+    void recurse_findIntersection(
+      float &t, Vector3f &ray, Vector3f &normal,
       Vector3f av, Vector3f bv,
       Renderable *ren,
       vector<Transformation> &transformation_stack){
@@ -366,7 +367,8 @@ namespace Assignment {
         cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
 
-        pair<float, Vector3f> new_ray_t = newton(av, bv, prm->getExp0(), prm->getExp1());
+        pair<float, Vector3f> new_ray_t =
+          newton(av, bv, prm->getExp0(), prm->getExp1());
         float new_t = new_ray_t.first;
         Vector3f new_ray = new_ray_t.second;
         cout << "==Computed t: " << new_t << endl;
@@ -381,8 +383,12 @@ namespace Assignment {
           ray = new_ray;
         }
 
+        normal = grad_sq_io(ray[0], ray[1], ray[2],
+          prm->getExp0(), prm->getExp1());
+
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;
+        cout << "==Global normal: " << normal << endl;
 
       } else if (ren->getType() == OBJ) {
         cout << "== In obj. About to recurse == " << endl;
@@ -403,7 +409,7 @@ namespace Assignment {
              }
              // Updates referenced t and ray with min + t
              // and the associated Vec3f
-              recurse_findIntersection(t, ray,
+              recurse_findIntersection(t, ray, normal
                av, bv,
                Renderable::get(child_it.second.name),
                transformation_stack);
@@ -459,16 +465,21 @@ namespace Assignment {
       vector<Transformation> transformation_stack;
       float t = 1000000000000;
       Vector3f ray;
-      recurse_findIntersection(t, ray, av, bv, ren, transformation_stack);
+      Vector3f normal;
+      recurse_findIntersection(t, ray, normal,
+        av, bv, ren, transformation_stack);
 
-      cout << "==Returned ray: " << ray << endl;
+      cout << "==Returned ray origin: " << ray << endl;
+      cout << "==Returned ray dir/normal: " << ray << endl;
+
+
       // Package into Ray obj
       intersection_ray.origin_x = ray[0];
       intersection_ray.origin_y = ray[1];
       intersection_ray.origin_z = ray[2];
-      intersection_ray.direction_x = 0.0;
-      intersection_ray.direction_y = 0.0;
-      intersection_ray.direction_z = -1.0;
+      intersection_ray.direction_x = normal[0];
+      intersection_ray.direction_y = normal[1];
+      intersection_ray.direction_z = normal[2];
 
       return intersection_ray;
     }

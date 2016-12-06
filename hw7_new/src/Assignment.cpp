@@ -512,8 +512,11 @@ namespace Assignment {
 
         Ray intersection_ray = findIntersection(camera_ray);
 
-        cout << "camera_ray origin = " << camera_ray.origin_x << " " <<
+        cout << "draw camera_ray origin = " << camera_ray.origin_x << " " <<
           camera_ray.origin_y << " " << camera_ray.origin_z << endl;
+        cout << "draw camera_ray origin = " << intersection_ray.origin_x << " " <<
+          intersection_ray.origin_y << " " << intersection_ray.origin_z << endl;
+        cout << "draw camera_ray coords = " << intersection_ray.getLocation(1.0) << endl;
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);

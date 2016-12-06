@@ -303,27 +303,27 @@ namespace Assignment {
         t_chosen = tminus;
         // return make_pair(t_chosen,
         //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
-        return iter_newton(tminus, av, bv, e, n), av, bv);
+        return iter_newton(tminus, av, bv, e, n);
       } else if (tminus * tplus < 0) { // they're of opposite signs
           cout << "== opposite signs ==" << endl;
-          float actual_tminus = iter_newton(tminus, av, bv, e, n);
-          float actual_tplus = iter_newton(tplus, av, bv, e, n);
-
-          int test_minus = sign(actual_tminus);
-          int test_plus = sign(actual_tplus);
-
-          if (test_minus + test_plus == 0){
-            // Different signs
-            t_chosen = actual_tminus;
-            return make_pair(t_chosen, getRay(actual_tminus, av, bv));
-          } else if (test_minus + test_plus > 0){
-            // They're both positive
-            t_chosen = min(actual_tminus, actual_tplus);
-            return make_pair(t_chosen, getRay(t_chosen, av, bv));
-          } else {
-            // They're both negative
-            return make_pair(t_chosen, ray);
-          }
+          // float actual_tminus = iter_newton(tminus, av, bv, e, n);
+          // float actual_tplus = iter_newton(tplus, av, bv, e, n);
+          //
+          // int test_minus = sign(actual_tminus);
+          // int test_plus = sign(actual_tplus);
+          //
+          // if (test_minus + test_plus == 0){
+          //   // Different signs
+          //   t_chosen = actual_tminus;
+          //   return make_pair(t_chosen, getRay(actual_tminus, av, bv));
+          // } else if (test_minus + test_plus > 0){
+          //   // They're both positive
+          //   t_chosen = min(actual_tminus, actual_tplus);
+          //   return make_pair(t_chosen, getRay(t_chosen, av, bv));
+          // } else {
+          //   // They're both negative
+          //   return make_pair(t_chosen, ray);
+          // }
       }
       // else {
       //   // t+ and t- are both negative

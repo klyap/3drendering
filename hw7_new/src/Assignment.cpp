@@ -435,6 +435,8 @@ namespace Assignment {
       // Position of camera
       Vector3f bv = Vector3f(
         camera_ray.origin_x, camera_ray.origin_y, camera_ray.origin_z);
+      cout << "av= " << av << endl;
+      cout << "bv= " << bv << endl;
 
       // Prep for recursing over tree
       const Line* cur_state = CommandLine::getState();
@@ -488,30 +490,25 @@ namespace Assignment {
           matrix[4], matrix[5], matrix[6], matrix[7],
           matrix[8], matrix[9], matrix[10], matrix[11],
           matrix[12], matrix[13], matrix[14], matrix[15];
-        //cout << "cam_rotation_matrix: " << cam_rotation_matrix << endl;
 
-        // for (int i = 0; i < 16; i++){
-        //   cout << matrix[i] << " ";
-        //   if (i % 4 == 3){
-        //      cout << endl;
-        //   }
-        // }
-        Vector4f cam_ori = Vector4f(0, 0, -1, 1);
-        Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
+        // Vector4f cam_ori = Vector4f(0, 0, -1, 1);
+        // Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
 
         Ray camera_ray;
         camera_ray.origin_x = camera->getPosition()[0];
         camera_ray.origin_y = camera->getPosition()[1];
         camera_ray.origin_z = camera->getPosition()[2];
-        camera_ray.direction_x = 0;
-        camera_ray.direction_y = 0;
-        camera_ray.direction_z = -1;
-
+        camera_ray.direction_x = 0.0;
+        camera_ray.direction_y = 0.0;
+        camera_ray.direction_z = -1.0;
         // camera_ray.direction_x = cam_dir[0];
         // camera_ray.direction_y = cam_dir[1];
         // camera_ray.direction_z = cam_dir[2];
 
         Ray intersection_ray = findIntersection(camera_ray);
+
+        cout << "camera_ray origin = " << camera_ray.origin_x << " " <<
+          camera_ray.origin_y << " " << camera_ray.origin_z << endl;
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);

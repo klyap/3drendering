@@ -87,17 +87,19 @@ namespace Assignment {
 
     int sq_io(float x, float y, float z, float e, float n){
       float test = pow(pow(x * x, 1/e) + pow(y * y, 1/e), e/n) + pow(z*z, 1/n) - 1;
-      cout << "sq_io: " << test << endl;
-      if (test < 0){
-        // inside object
-        return -1;
-      } else if (test > 0){
-        //outside object
-        return 1;
-      }
-      //on surface
+      // cout << "sq_io: " << test << endl;
+      // if (test < 0){
+      //   // inside object
+      //   return -1;
+      // } else if (test > 0){
+      //   //outside object
+      //   return 1;
+      // }
+      // //on surface
 
-      return 0;
+      //return 0;
+
+      return test;
     }
 
     //The normal at any point xyz is simply the gradient of the sq_io function
@@ -148,7 +150,7 @@ namespace Assignment {
              int check_inside = sq_io(coords[0], coords[1], coords[2],
                prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
-             if (check_inside == -1){
+             if (check_inside < 0){
                cout << "check inside == -1" << endl;
                return true;
              }
@@ -337,11 +339,12 @@ namespace Assignment {
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
       cout << "==INIT g prime: " << gprime << " g: " << g << endl;
       cout << "==INIT t: " << t << endl;
-      while ((-1/20 >= g || g >= 1/20) && gprime < 0){ // stopping condition
+      while ((-1.0/20 >= g || g >= 1.0/20) && gprime <= 0.0){ // stopping condition
+        rayt = getRay(t, av, bv);
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
         t = t - g/gprime;
-        rayt = getRay(t, av, bv);
+
         cout << "==NEW g prime: " << gprime << " g: " << g << endl;
         cout << "==NEW t: " << t << endl;
       }

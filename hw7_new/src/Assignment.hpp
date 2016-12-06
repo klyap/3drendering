@@ -10,7 +10,7 @@ class Scene;
 namespace Assignment {
     Matrix4f makeTransform(Transformation t);
     Matrix4f makeRotation(Vector4f unit_q);
-    int sq_io(float x, float y, float z, float e, float n);
+    float sq_io(float x, float y, float z, float e, float n);
     float getTminus(float a, float b, float c);
     float getTplus(float a, float b, float c);
     Vector3f grad_sq_io(float x, float y, float z, float e, float n);

@@ -85,7 +85,7 @@ namespace Assignment {
       return transform;
     }
 
-    int sq_io(float x, float y, float z, float e, float n){
+    float sq_io(float x, float y, float z, float e, float n){
       float test = pow(pow(x * x, 1/e) + pow(y * y, 1/e), e/n) + pow(z*z, 1/n) - 1;
       // cout << "sq_io: " << test << endl;
       // if (test < 0){
@@ -147,11 +147,11 @@ namespace Assignment {
              }
 
              // Do in/out test
-             int check_inside = sq_io(coords[0], coords[1], coords[2],
+             float check_inside = sq_io(coords[0], coords[1], coords[2],
                prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
              if (check_inside < 0){
-               cout << "check inside == -1" << endl;
+               cout << "check inside is -" << endl;
                return true;
              }
             return false;

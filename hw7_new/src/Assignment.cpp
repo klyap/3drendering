@@ -301,8 +301,9 @@ namespace Assignment {
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
         cout << "== both + ==" << endl;
         t_chosen = tminus;
-        return make_pair(t_chosen,
-          getRay(iter_newton(tminus, av, bv, e, n), av, bv));
+        // return make_pair(t_chosen,
+        //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
+        return iter_newton(tminus, av, bv, e, n), av, bv);
       } else if (tminus * tplus < 0) { // they're of opposite signs
           cout << "== opposite signs ==" << endl;
           float actual_tminus = iter_newton(tminus, av, bv, e, n);
@@ -333,7 +334,7 @@ namespace Assignment {
     }
 
     // Gets final t
-    float iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
+    pair<float, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
       cout << "== Iter newton ==" << endl;
       Vector3f rayt = getRay(t, av, bv);
       float gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
@@ -351,7 +352,8 @@ namespace Assignment {
       }
       cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
       cout << "==FINAL t: " << t << endl;
-      return t;
+
+      return make_pair(t, rayt);
     }
 
     void recurse_findIntersection(float &t, Vector3f &ray,

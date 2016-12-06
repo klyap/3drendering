@@ -429,8 +429,8 @@ namespace Assignment {
 
         // "Return": Set t and ray
         // Choose smallest positive t
-        new_t = max(0.0, new_t);
-        t = min(t, new_t);
+        new_t = fmax(0.0, new_t);
+        t = fmin(t, new_t);
 
         if (t == new_t){
           ray = new_ray;
@@ -441,8 +441,11 @@ namespace Assignment {
           prm->getExp0(), prm->getExp1());
 
         // Transform position and normal back into normal coords
-        ray *= forward.inverse();
-        normal *= forward_SR.transpose().inverse();
+
+        Matrix4f forward_inv = forward.inverse();
+        ray *= forward_inv.transpose();
+        Matrix4f forward_SR_inv = forward_SR.inverse();
+        normal *= forward_SR_inv.transpose();
 
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;

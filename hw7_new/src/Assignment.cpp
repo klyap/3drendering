@@ -516,7 +516,7 @@ namespace Assignment {
           camera_ray.origin_y << " " << camera_ray.origin_z << endl;
         cout << "draw camera_ray origin = " << intersection_ray.origin_x << " " <<
           intersection_ray.origin_y << " " << intersection_ray.origin_z << endl;
-        cout << "draw camera_ray coords = " << intersection_ray.getLocation(1.0) << endl;
+        cout << "draw camera_ray coords = " << endpoint << endl;
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);
@@ -526,7 +526,7 @@ namespace Assignment {
             intersection_ray.origin_x,
             intersection_ray.origin_y,
             intersection_ray.origin_z);
-        Vector3f endpoint = intersection_ray.getLocation(1.0);
+        Vector3f endpoint = intersection_ray.getLocation(10.0);
         glVertex3f(endpoint[0], endpoint[1], endpoint[2]);
         glEnd();
     }

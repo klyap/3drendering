@@ -301,8 +301,7 @@ namespace Assignment {
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
         cout << "== both + ==" << endl;
         t_chosen = tminus;
-        // return make_pair(t_chosen,
-        //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
+
         return iter_newton(tminus, av, bv, e, n);
       } else if (tminus * tplus < 0) { // they're of opposite signs
           cout << "== opposite signs ==" << endl;
@@ -377,17 +376,48 @@ namespace Assignment {
         Vector4f av4(av[0],av[1],av[2],1);
         av4 = av4.transpose() * transform;
         cout << "av4 origin after init scale: " << av4 << endl;
+        Vector4f bv4(bv[0],bv[1],bv[2],1);
+        bv4 = bv4.transpose() * transform;
+        cout << "bv4 origin after init scale: " << bv4 << endl;
 
+        Matrix4f forward;
+        forward <<
+          1, 1, 1, 1,
+          1, 1, 1, 1,
+          1, 1, 1, 1,
+          1, 1, 1, 1;
+        Matrix4f forward_SR;
+        forward_SR <<
+            1, 1, 1, 1,
+            1, 1, 1, 1,
+            1, 1, 1, 1,
+            1, 1, 1, 1;
         for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
-          av4 = av4.transpose() * transform;
+          forward *= transform;
+          //av4 = av4.transpose() * transform;
+          if (transformation_stack.at(i).type == SCALE ||
+              transformation_stack.at(i).type == ROTATE){
+            // Add to SR
+            forward_SR *= transform;
+          }
         }
 
+        // Position (all transforms)
+        av4 = av4.transpose() * forward_SR;
         cout << "ray4 origin after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
         av[2] = av4[2];
         cout << "av origin after all transforms: " << av << endl;
+
+        // Direction/normal (SR only)
+        bv4 = bv4.transpose() * forward;
+        cout << "ray4 origin after all transforms: " << bv4 << endl;
+        bv[0] = bv4[0];
+        bv[1] = bv4[1];
+        bv[2] = bv4[2];
+        cout << "av origin after all transforms: " << bv << endl;
 
         // Do computations in superquadratic space
         pair<float, Vector3f> new_ray_t =
@@ -395,23 +425,24 @@ namespace Assignment {
         float new_t = new_ray_t.first;
         Vector3f new_ray = new_ray_t.second;
         cout << "==Computed t: " << new_t << endl;
-        cout << "==Computed ray: " << new_ray << endl;
+        cout << "==Computed ray: " << new_ray << endl; // New position
 
         // "Return": Set t and ray
         // Choose smallest positive t
-        new_t = fmax(0.0, new_t);
+        new_t = max(0.0, new_t);
         t = min(t, new_t);
 
         if (t == new_t){
           ray = new_ray;
         }
 
-        // Do computations in superquadratic space
-        normal = grad_sq_io(ray[0], ray[1], ray[2],
+        // Get normal from position
+        normal = av * grad_sq_io(ray[0], ray[1], ray[2],
           prm->getExp0(), prm->getExp1());
 
-
-
+        // Transform position and normal back into normal coords
+        ray *= forward.inverse();
+        normal *= forward_SR.transpose().inverse();
 
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;

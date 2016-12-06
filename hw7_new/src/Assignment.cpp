@@ -369,21 +369,25 @@ namespace Assignment {
 
         // Apply all transforms to av
         // Apply only scales and rotates to bv
-        // Vector3f ini_scale_coords = prm->getCoeff();
-        //
-        // Transformation ini_scale =
-        //    Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
-        // Matrix4f transform = makeTransform(ini_scale);
-        // Vector4f ray4(ray[0],ray[1],ray[2],1);
-        // ray = ray.transpose() * transform;
-        // cout << "ray origin after init scale: " << ray << endl;
-        //
-        // for (int i = 0; i < transformation_stack.size(); i++){
-        //   Matrix4f transform = makeTransform(transformation_stack.at(i));
-        //   ray = ray.transpose() * transform;
-        // }
-        //
-        // cout << "ray origin after all transforms: " << ray << endl;
+        Vector3f ini_scale_coords = prm->getCoeff();
+
+        Transformation ini_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(ini_scale);
+        Vector4f av4(av[0],av[1],av[2],1);
+        av4 = av4.transpose() * transform;
+        cout << "av4 origin after init scale: " << av4 << endl;
+
+        for (int i = 0; i < transformation_stack.size(); i++){
+          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          av4 = av4.transpose() * transform;
+        }
+
+        cout << "ray4 origin after all transforms: " << av4 << endl;
+        av[0] = av4[0];
+        av[1] = av4[1];
+        av[2] = av4[2];
+        cout << "av origin after all transforms: " << av << endl;
 
         // Do computations in superquadratic space
         pair<float, Vector3f> new_ray_t =

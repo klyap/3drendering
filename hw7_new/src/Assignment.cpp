@@ -409,7 +409,7 @@ namespace Assignment {
              }
              // Updates referenced t and ray with min + t
              // and the associated Vec3f
-              recurse_findIntersection(t, ray, normal
+              recurse_findIntersection(t, ray, normal,
                av, bv,
                Renderable::get(child_it.second.name),
                transformation_stack);

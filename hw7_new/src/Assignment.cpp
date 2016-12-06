@@ -337,7 +337,7 @@ namespace Assignment {
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
       cout << "==INIT g prime: " << gprime << " g: " << g << endl;
       cout << "==INIT t: " << t << endl;
-      while (-1/20 >= g && g >= 1/20 && gprime < 0){ // stopping condition
+      while ((-1/20 >= g || g >= 1/20) && gprime < 0){ // stopping condition
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
         t = t - g/gprime;
@@ -502,9 +502,9 @@ namespace Assignment {
         camera_ray.direction_y = 0;
         camera_ray.direction_z = -1;
 
-        camera_ray.direction_x = cam_dir[0];
-        camera_ray.direction_y = cam_dir[1];
-        camera_ray.direction_z = cam_dir[2];
+        // camera_ray.direction_x = cam_dir[0];
+        // camera_ray.direction_y = cam_dir[1];
+        // camera_ray.direction_z = cam_dir[2];
 
         Ray intersection_ray = findIntersection(camera_ray);
 

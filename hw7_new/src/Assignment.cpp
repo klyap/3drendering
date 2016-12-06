@@ -278,15 +278,15 @@ namespace Assignment {
     pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
       cout << "== newton == "<< endl;
       float a = av.dot(av);
-      float b = 2 * av.dot(bv);
-      float c = bv.dot(bv) - 3;
+      float b = 2.0 * av.dot(bv);
+      float c = bv.dot(bv) - 3.0;
 
       cout << "== abc: " << a << " " << b << " " << c << endl;
 
       float tminus = getTminus(a, b, c);
       float tplus = getTplus(a, b, c);
-      float d =  b*b - 4*a*c; // discriminant
-      float t_chosen = 0;
+      float d =  b*b - 4.0*a*c; // discriminant
+      float t_chosen = 0.0;
       Vector3f ray = Vector3f(0,0,0);
       cout << "tminus = " << tminus << " tplus = " << tplus << endl;
 

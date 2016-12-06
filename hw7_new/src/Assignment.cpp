@@ -367,6 +367,24 @@ namespace Assignment {
         cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
 
+        // Apply all transforms to av
+        // Apply only scales and rotates to bv
+        Vector3f ini_scale_coords = prm->getCoeff();
+
+        Transformation ini_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(ini_scale);
+        ray = ray.transpose() * transform;
+        cout << "ray origin after init scale: " << ray << endl;
+
+        for (int i = 0; i < transformation_stack.size(); i++){
+          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          ray = ray.transpose() * transform;
+        }
+
+        cout << "ray origin after all transforms: " << coords << endl;
+
+        // Do computations in superquadratic space
         pair<float, Vector3f> new_ray_t =
           newton(av, bv, prm->getExp0(), prm->getExp1());
         float new_t = new_ray_t.first;
@@ -383,22 +401,12 @@ namespace Assignment {
           ray = new_ray;
         }
 
+        // Do computations in superquadratic space
         normal = grad_sq_io(ray[0], ray[1], ray[2],
           prm->getExp0(), prm->getExp1());
 
-       // Apply transform to normal
-       Vector3f ini_scale_coords = prm->getCoeff();
 
-       Transformation ini_scale =
-          Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
-       Matrix4f transform = makeTransform(ini_scale);
-       normal = normal.transpose() * transform;
-       cout << "coords after init scale: " << coords << endl;
 
-       for (int i = 0; i < transformation_stack.size(); i++){
-         Matrix4f transform = makeTransform(transformation_stack.at(i));
-         normal = normal.transpose() * transform;
-       }
 
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;
@@ -525,9 +533,12 @@ namespace Assignment {
         // Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
 
         Ray camera_ray;
-        camera_ray.origin_x = camera->getPosition()[0];
-        camera_ray.origin_y = camera->getPosition()[1];
-        camera_ray.origin_z = camera->getPosition()[2];
+        // camera_ray.origin_x = camera->getPosition()[0];
+        // camera_ray.origin_y = camera->getPosition()[1];
+        // camera_ray.origin_z = camera->getPosition()[2];
+        camera_ray.origin_x = 0;
+        camera_ray.origin_y = 5;
+        camera_ray.origin_z = 10;
         camera_ray.direction_x = 0.0;
         camera_ray.direction_y = 0.0;
         camera_ray.direction_z = -1.0;

@@ -296,8 +296,8 @@ namespace Assignment {
       } else if (tminus == tplus){
         cout << "== equal ==" << endl;
         t_chosen = tminus;
-        return make_pair(t_chosen,
-          getRay(iter_newton(tminus, av, bv, e, n), av, bv));
+        // return make_pair(t_chosen,
+        //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
         cout << "== both + ==" << endl;
         t_chosen = tminus;

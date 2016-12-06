@@ -386,6 +386,20 @@ namespace Assignment {
         normal = grad_sq_io(ray[0], ray[1], ray[2],
           prm->getExp0(), prm->getExp1());
 
+       // Apply transform to normal
+       Vector3f ini_scale_coords = prm->getCoeff();
+
+       Transformation ini_scale =
+          Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+       Matrix4f transform = makeTransform(ini_scale);
+       normal = normal.transpose() * transform;
+       cout << "coords after init scale: " << coords << endl;
+
+       for (int i = 0; i < transformation_stack.size(); i++){
+         Matrix4f transform = makeTransform(transformation_stack.at(i));
+         normal = normal.transpose() * transform;
+       }
+
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;
         cout << "==Global normal: " << normal << endl;
@@ -533,7 +547,7 @@ namespace Assignment {
             intersection_ray.origin_x,
             intersection_ray.origin_y,
             intersection_ray.origin_z);
-        Vector3f endpoint = intersection_ray.getLocation(10.0);
+        Vector3f endpoint = intersection_ray.getLocation(1.0);
         glVertex3f(endpoint[0], endpoint[1], endpoint[2]);
         glEnd();
 

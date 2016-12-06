@@ -341,6 +341,7 @@ namespace Assignment {
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
         t = t - g/gprime;
+        rayt = getRay(t, av, bv);
         cout << "==NEW g prime: " << gprime << " g: " << g << endl;
         cout << "==NEW t: " << t << endl;
       }

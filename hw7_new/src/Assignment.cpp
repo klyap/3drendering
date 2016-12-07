@@ -408,8 +408,11 @@ namespace Assignment {
           }
         }
 
+        cout << "forward" << forward << endl;
+        cout << "forward_SR" << forward_SR << endl;
+
         // Position (all transforms)
-        av4 = av4.transpose() * forward_SR;
+        av4 = av4 * forward_SR;
         cout << "ray4 origin after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
@@ -417,7 +420,7 @@ namespace Assignment {
         cout << "av origin after all transforms: " << av << endl;
 
         // Direction/normal (SR only)
-        bv4 = bv4.transpose() * forward;
+        bv4 = bv4 * forward;
         cout << "ray4 origin after all transforms: " << bv4 << endl;
         bv[0] = bv4[0];
         bv[1] = bv4[1];

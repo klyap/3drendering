@@ -60,9 +60,9 @@ namespace Assignment {
 
       if (type == TRANS){
         cout << "Transform stack: trans " << type << endl;
-        transform << 1, 0, 0, -t.trans[0],
-                 0, 1, 0, -t.trans[1],
-                 0, 0, 1, -t.trans[2],
+        transform << 1, 0, 0, -1.0 * t.trans[0],
+                 0, 1, 0, -1.0 * t.trans[1],
+                 0, 0, 1, -1.0 * t.trans[2],
                  0, 0, 0, 1;
       }
       else if (type == SCALE){

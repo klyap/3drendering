@@ -78,7 +78,7 @@ namespace Assignment {
         // Convert to normal axes and invert
         cout << "Transform scale: rotate " << type << endl;
         //makeRotateMat(float *matrix, float x, float y, float z, float angle);
-        transform = makeRotationQuat(t.trans);
+        transform = makeRotationQuat(t.trans).transpose();
       }
 
       cout << transform << endl;
@@ -377,16 +377,13 @@ namespace Assignment {
 
         // Apply all inverse transforms to av
         // Apply only inverse scales and rotates to bv
-        Vector3f ini_scale_coords = prm->getCoeff();
-        Transformation ini_scale =
-           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
-        Matrix4f transform = makeTransform(ini_scale);
-        Vector4f av4(av[0],av[1],av[2],1);
-        av4 = av4.transpose() * transform;
-        cout << "av4 origin after init scale: " << av4 << endl;
-        Vector4f bv4(bv[0],bv[1],bv[2],1);
-        bv4 = bv4.transpose() * transform;
-        cout << "bv4 origin after init scale: " << bv4 << endl;
+
+        // Vector4f av4(av[0],av[1],av[2],1);
+        // av4 = av4.transpose() * transform;
+        // cout << "av4 origin after init scale: " << av4 << endl;
+        // Vector4f bv4(bv[0],bv[1],bv[2],1);
+        // bv4 = bv4.transpose() * transform;
+        // cout << "bv4 origin after init scale: " << bv4 << endl;
 
         Matrix4f forward;
         forward <<
@@ -401,7 +398,7 @@ namespace Assignment {
           0, 0, 1, 0,
           0, 0, 0, 1;
 
-        for (int i = 0; i < transformation_stack.size(); i++){
+        for (int i = transformation_stack.size(); i < 0; i--){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
@@ -411,19 +408,28 @@ namespace Assignment {
           }
         }
 
+        // Initial coeff scaling
+        Vector3f ini_scale_coords = prm->getCoeff();
+        Transformation ini_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(ini_scale);
+        forward *= transform;
+        forward_SR *= transform;
+
         cout << "forward" << forward << endl;
         cout << "forward_SR" << forward_SR << endl;
 
-        // Position (all transforms)
-        av4 = forward * av4;
+        // Direction/normal (SR only)
+        av4 = forward_SR * av4;
         cout << "ray4 origin after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
         av[2] = av4[2];
         cout << "av origin after all transforms: " << av << endl;
 
-        // Direction/normal (SR only)
-        bv4 = forward_SR * bv4;
+
+        // Position (all transforms)
+        bv4 = forward * bv4;
         cout << "ray4 after all transforms: " << bv4 << endl;
         bv[0] = bv4[0];
         bv[1] = bv4[1];

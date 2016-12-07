@@ -590,7 +590,7 @@ namespace Assignment {
         // camera_ray.origin_y = camera->getPosition()[1];
         // camera_ray.origin_z = camera->getPosition()[2];
         camera_ray.origin_x = 0;
-        camera_ray.origin_y = 0.3;
+        camera_ray.origin_y = 0;
         camera_ray.origin_z = 10;
         camera_ray.direction_x = 0.0;
         camera_ray.direction_y = 0.0;

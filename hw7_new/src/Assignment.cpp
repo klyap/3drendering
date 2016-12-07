@@ -459,7 +459,7 @@ namespace Assignment {
           0, 0, 0, 1;
 
         for (int i = 0; i < transformation_stack.size(); i++){
-          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-i));
           cout << "Transform stack = " << transform << endl;
           backward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
@@ -515,7 +515,7 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = forward * ray4;
+        ray4 = backward * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = backward_SR.transpose() * normal4;

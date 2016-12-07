@@ -382,7 +382,6 @@ namespace Assignment {
 
         // Apply all inverse transforms to av
         // Apply only inverse scales and rotates to bv
-
         Vector4f av4(av[0],av[1],av[2],1);
         //av4 = av4.transpose() * transform;
         // cout << "av4 origin after init scale: " << av4 << endl;
@@ -460,10 +459,10 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = forward_inv * ray4;
+        ray4 = ray4 * forward_inv; // TODO: swap order
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_SR_inv * normal4;
+        normal4 = normal4 * forward_SR_inv;// TODO: swap order
         cout << "==Global ray4: " << ray4 << endl;
         cout << "==Global normal4: " << normal4 << endl;
 

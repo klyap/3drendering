@@ -477,9 +477,9 @@ namespace Assignment {
         // Do newton computations in superquadric space (or whatever it's called)
         pair<Vector3f, Vector3f> new_ray_t =
           newton(av, bv, prm->getExp0(), prm->getExp1());
+
         Vector3f new_normal = new_ray_t.first;
         Vector3f new_position = new_ray_t.second;
-        //cout << "==Computed t: " << new_t << endl;
         cout << "==Computed position: " << new_position << endl; // New position
         cout << "==Computed normal: " << new_normal << endl; // New normal
 
@@ -495,6 +495,13 @@ namespace Assignment {
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = forward_SR.transpose() * normal4;
+
+        Transformation last_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(last_scale);
+        backward *= transform;
+        backward_SR *= transform;
+
         cout << "== Position transformed back out: " << ray4 << endl;
         cout << "== normal4 transformed back out: " << normal4 << endl;
 
@@ -513,23 +520,10 @@ namespace Assignment {
           cout << "normal: " << normal << endl;
         }
 
-        // "Return": Set t and ray
-        // Choose smallest positive t wrt this primitive <---- NO!
-        // Instead, choose smallest distance to camera
-        // new_t = fmax(0.0, new_t);
-        // t = fmin(t, new_t);
-        //
-        // if (t == new_t){
-        //   ray = new_position;
-        // }
-
-
-        //cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;
         cout << "==Global normal: " << normal << endl;
 
       } else if (ren->getType() == OBJ) {
-        cout << "== In obj. About to recurse == " << endl;
         // Iterate over children until you get to a primitive
          Object *obj = dynamic_cast<Object*>(ren);
          const vector<Transformation>& overall_trans =
@@ -567,9 +561,7 @@ namespace Assignment {
     }
 
     Ray findIntersection(const Ray &camera_ray) {
-      /* TODO
-      *
-      **/
+
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;
       intersection_ray.origin_y = 1.0;
@@ -624,34 +616,19 @@ namespace Assignment {
 
     void drawIntersectTest(Camera *camera) {
 
-        // Vector4f cam_rotation = Vector4f(camera->getAxis()[0],
+        // float matrix[16];
+        // makeRotateMat(matrix, camera->getAxis()[0],
         //   camera->getAxis()[1], camera->getAxis()[2],
-        //   camera->getAngle());
-
-        float matrix[16];
-        makeRotateMat(matrix, camera->getAxis()[0],
-          camera->getAxis()[1], camera->getAxis()[2],
-          degToRad(camera->getAngle()));
-
-
-        // cout << "-------------------------" << endl;
-        // cout << camera->getAxis()[0] << "  " <<
-        //   camera->getAxis()[1] << "  " << camera->getAxis()[2] << "  " <<
-        //   camera->getAngle() << endl;
-        Matrix4f cam_rotation_matrix;
-        cam_rotation_matrix <<
-          matrix[0], matrix[1], matrix[2], matrix[3],
-          matrix[4], matrix[5], matrix[6], matrix[7],
-          matrix[8], matrix[9], matrix[10], matrix[11],
-          matrix[12], matrix[13], matrix[14], matrix[15];
-
-        // Vector4f cam_ori = Vector4f(0, 0, -1, 1);
-        // Vector4f cam_dir = cam_ori.transpose() * cam_rotation_matrix;
+        //   degToRad(camera->getAngle()));
+        //
+        // Matrix4f cam_rotation_matrix;
+        // cam_rotation_matrix <<
+        //   matrix[0], matrix[1], matrix[2], matrix[3],
+        //   matrix[4], matrix[5], matrix[6], matrix[7],
+        //   matrix[8], matrix[9], matrix[10], matrix[11],
+        //   matrix[12], matrix[13], matrix[14], matrix[15];
 
         Ray camera_ray;
-        // camera_ray.origin_x = camera->getPosition()[0];
-        // camera_ray.origin_y = camera->getPosition()[1];
-        // camera_ray.origin_z = camera->getPosition()[2];
         camera_ray.origin_x = 0;
         camera_ray.origin_y = 0;
         camera_ray.origin_z = 10;
@@ -663,8 +640,6 @@ namespace Assignment {
         // camera_ray.direction_z = cam_dir[2];
 
         Ray intersection_ray = findIntersection(camera_ray);
-
-
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);

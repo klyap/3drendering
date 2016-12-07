@@ -436,8 +436,8 @@ namespace Assignment {
         }
 
         // Get normal from position
-        normal = av * grad_sq_io(ray[0], ray[1], ray[2],
-          prm->getExp0(), prm->getExp1());
+        normal = av.dot(grad_sq_io(ray[0], ray[1], ray[2],
+          prm->getExp0(), prm->getExp1()));
 
         // Pull into Vec4 for 4x4 rotation matrices
         Vector4f ray4(ray[0], ray[1], ray[2], 1);

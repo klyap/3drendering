@@ -15,8 +15,9 @@ namespace Assignment {
     float getTplus(float a, float b, float c);
     Vector3f grad_sq_io(float x, float y, float z, float e, float n);
     Vector3f getRay(float t, Vector3f av, Vector3f bv);
-    pair <float, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n);
-    pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n);
+    pair <Vector3f, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n);
+    pair<Vector3f, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n);
+
     void recurse_findIntersection(float &t, Vector3f &ray,
       Vector3f av, Vector3f bv, Renderable *ren,
       vector<Transformation> &transformation_stack);

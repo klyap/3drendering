@@ -275,7 +275,8 @@ namespace Assignment {
     }
 
     // Finds final t based on tplus and tminus conditions
-    pair<float, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
+    // Returns the normal and position (aka new av and bv)
+    pair<Vector3f, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
       cout << "== newton == "<< endl;
       float a = av.dot(av);
       float b = 2.0 * av.dot(bv);
@@ -296,6 +297,7 @@ namespace Assignment {
       } else if (tminus == tplus){
         cout << "== equal ==" << endl;
         t_chosen = tminus;
+        return iter_newton(t_chosen, av, bv, e, n);
         // return make_pair(t_chosen,
         //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
@@ -332,11 +334,12 @@ namespace Assignment {
       return make_pair(t_chosen, ray); // should default to Vector3f(0,0,0)
     }
 
-    // Gets final t
-    pair<float, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
+    // Gets final t; returns normal and position
+    pair<Vector3f, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
       cout << "== Iter newton ==" << endl;
       Vector3f rayt = getRay(t, av, bv);
-      float gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
+      Vector3f normal = grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
+      float gprime = av.dot(normal);
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
       cout << "==INIT g prime: " << gprime << " g: " << g << endl;
       cout << "==INIT t: " << t << endl;
@@ -352,7 +355,7 @@ namespace Assignment {
       cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
       cout << "==FINAL t: " << t << endl;
 
-      return make_pair(t, rayt);
+      return make_pair(normal, rayt);
     }
 
     void recurse_findIntersection(
@@ -366,100 +369,105 @@ namespace Assignment {
         cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
 
-        // Apply all transforms to av
-        // Apply only scales and rotates to bv
-        // Vector3f ini_scale_coords = prm->getCoeff();
-        //
-        // Transformation ini_scale =
-        //    Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
-        // Matrix4f transform = makeTransform(ini_scale);
-        // Vector4f av4(av[0],av[1],av[2],1);
-        // av4 = av4.transpose() * transform;
-        // cout << "av4 origin after init scale: " << av4 << endl;
-        // Vector4f bv4(bv[0],bv[1],bv[2],1);
-        // bv4 = bv4.transpose() * transform;
-        // cout << "bv4 origin after init scale: " << bv4 << endl;
-        //
-        // Matrix4f forward;
-        // forward <<
-        //   1, 1, 1, 1,
-        //   1, 1, 1, 1,
-        //   1, 1, 1, 1,
-        //   1, 1, 1, 1;
-        // Matrix4f forward_SR;
-        // forward_SR <<
-        //     1, 1, 1, 1,
-        //     1, 1, 1, 1,
-        //     1, 1, 1, 1,
-        //     1, 1, 1, 1;
-        // for (int i = 0; i < transformation_stack.size(); i++){
-        //   Matrix4f transform = makeTransform(transformation_stack.at(i));
-        //   forward *= transform;
-        //   if (transformation_stack.at(i).type == SCALE ||
-        //       transformation_stack.at(i).type == ROTATE){
-        //     // Add to SR
-        //     forward_SR *= transform;
-        //   }
-        // }
-        //
-        // // Position (all transforms)
-        // av4 = av4.transpose() * forward_SR;
-        // cout << "ray4 origin after all transforms: " << av4 << endl;
-        // av[0] = av4[0];
-        // av[1] = av4[1];
-        // av[2] = av4[2];
-        // cout << "av origin after all transforms: " << av << endl;
-        //
-        // // Direction/normal (SR only)
-        // bv4 = bv4.transpose() * forward;
-        // cout << "ray4 origin after all transforms: " << bv4 << endl;
-        // bv[0] = bv4[0];
-        // bv[1] = bv4[1];
-        // bv[2] = bv4[2];
-        // cout << "av origin after all transforms: " << bv << endl;
+        // Apply all inverse transforms to av
+        // Apply only inverse scales and rotates to bv
+        Vector3f ini_scale_coords = prm->getCoeff();
+        Transformation ini_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(ini_scale);
+        Vector4f av4(av[0],av[1],av[2],1);
+        av4 = av4.transpose() * transform;
+        cout << "av4 origin after init scale: " << av4 << endl;
+        Vector4f bv4(bv[0],bv[1],bv[2],1);
+        bv4 = bv4.transpose() * transform;
+        cout << "bv4 origin after init scale: " << bv4 << endl;
 
-        // Do computations in superquadratic space
+        Matrix4f forward;
+        forward <<
+          1, 1, 1, 1,
+          1, 1, 1, 1,
+          1, 1, 1, 1,
+          1, 1, 1, 1;
+        Matrix4f forward_SR;
+        forward_SR <<
+            1, 1, 1, 1,
+            1, 1, 1, 1,
+            1, 1, 1, 1,
+            1, 1, 1, 1;
+
+        for (int i = 0; i < transformation_stack.size(); i++){
+          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          forward *= transform;
+          if (transformation_stack.at(i).type == SCALE ||
+              transformation_stack.at(i).type == ROTATE){
+            // Add to SR
+            forward_SR *= transform;
+          }
+        }
+
+        // Position (all transforms)
+        av4 = av4.transpose() * forward_SR;
+        cout << "ray4 origin after all transforms: " << av4 << endl;
+        av[0] = av4[0];
+        av[1] = av4[1];
+        av[2] = av4[2];
+        cout << "av origin after all transforms: " << av << endl;
+
+        // Direction/normal (SR only)
+        bv4 = bv4.transpose() * forward;
+        cout << "ray4 origin after all transforms: " << bv4 << endl;
+        bv[0] = bv4[0];
+        bv[1] = bv4[1];
+        bv[2] = bv4[2];
+        cout << "av origin after all transforms: " << bv << endl;
+
+        // Do newton computations in superquadric space (or whatever it's called)
         pair<float, Vector3f> new_ray_t =
           newton(av, bv, prm->getExp0(), prm->getExp1());
-        float new_t = new_ray_t.first;
-        Vector3f new_ray = new_ray_t.second;
+        Vector3f new_normal = new_ray_t.first;
+        Vector3f new_position = new_ray_t.second;
         cout << "==Computed t: " << new_t << endl;
-        cout << "==Computed ray: " << new_ray << endl; // New position
+        cout << "==Computed ray: " << new_position << endl; // New position
+
+        // Transform position and normals back out of superquadric space
+        // Pull into Vec4 for 4x4 rotation matrices
+        Vector4f ray4(ray[0], ray[1], ray[2], 1);
+        Vector4f normal4(normal[0], normal[1], normal[2], 1);
+
+        // Transform position and normal back into normal coords
+        Matrix4f forward_inv = forward.inverse();
+        Matrix4f forward_inv_t = forward_inv.transpose();
+        ray4 = forward_inv_t * ray4;
+        Matrix4f forward_SR_inv = forward_SR.inverse();
+        Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
+        normal4 = forward_SR_inv_t * normal4;
+        cout << "==Global ray4: " << ray4 << endl;
+        cout << "==Global normal4: " << normal4 << endl;
+
+        // Put back into vec3
+        ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
+        normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
+
 
         // "Return": Set t and ray
-        // Choose smallest positive t
+        // Choose smallest positive t wrt this primitive <---- NO!
+        // Instead, choose smallest distance to camera
         new_t = fmax(0.0, new_t);
         t = fmin(t, new_t);
 
         if (t == new_t){
-          ray = new_ray;
+          ray = new_position;
         }
 
         // Get normal from position
         // Vector3f gradient = grad_sq_io(ray[0], ray[1], ray[2],
         //    prm->getExp0(), prm->getExp1());
-        // normal = av.dot(gradient); // TODO: threw error mismatched types
+        // normal = gradient;
 
-        normal = prm->getNormal(ray);
+        // normal = prm->getNormal(ray);
 
 
-        // // Pull into Vec4 for 4x4 rotation matrices
-        // Vector4f ray4(ray[0], ray[1], ray[2], 1);
-        // Vector4f normal4(normal[0], normal[1], normal[2], 1);
-        //
-        // // Transform position and normal back into normal coords
-        // Matrix4f forward_inv = forward.inverse();
-        // Matrix4f forward_inv_t = forward_inv.transpose();
-        // ray4 = forward_inv_t * ray4;
-        // Matrix4f forward_SR_inv = forward_SR.inverse();
-        // Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        // normal4 = forward_SR_inv_t * normal4;
-        // cout << "==Global ray4: " << ray4 << endl;
-        // cout << "==Global normal4: " << normal4 << endl;
-        //
-        // // Put back into vec3
-        // ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
-        // normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
+
 
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;

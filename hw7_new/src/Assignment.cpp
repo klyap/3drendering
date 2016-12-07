@@ -438,7 +438,7 @@ namespace Assignment {
         // Get normal from position
         Vector3f gradient = grad_sq_io(ray[0], ray[1], ray[2],
           prm->getExp0(), prm->getExp1());
-        normal = av.dot(gradient);
+        //normal = av.dot(gradient); // TODO: threw error mismatched types
 
         // Pull into Vec4 for 4x4 rotation matrices
         Vector4f ray4(ray[0], ray[1], ray[2], 1);

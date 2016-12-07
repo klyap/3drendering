@@ -429,8 +429,9 @@ namespace Assignment {
           newton(av, bv, prm->getExp0(), prm->getExp1());
         Vector3f new_normal = new_ray_t.first;
         Vector3f new_position = new_ray_t.second;
-        cout << "==Computed t: " << new_t << endl;
-        cout << "==Computed ray: " << new_position << endl; // New position
+        //cout << "==Computed t: " << new_t << endl;
+        cout << "==Computed position: " << new_position << endl; // New position
+        cout << "==Computed normal: " << new_normal << endl; // New normal
 
         // Transform position and normals back out of superquadric space
         // Pull into Vec4 for 4x4 rotation matrices

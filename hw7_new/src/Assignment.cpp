@@ -518,7 +518,7 @@ namespace Assignment {
         ray4 = forward * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_SR * normal4;
+        normal4 = backward_SR.transpose() * normal4;
         cout << "== Position transformed back out: " << ray4 << endl;
         cout << "== normal4 transformed back out: " << normal4 << endl;
 

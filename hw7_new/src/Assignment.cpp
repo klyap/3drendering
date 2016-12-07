@@ -447,7 +447,7 @@ namespace Assignment {
         Matrix4f forward_inv = forward.inverse();
         ray4 *= forward_inv.transpose();
         Matrix4f forward_SR_inv = forward_SR.inverse();
-        normal *= forward_SR_inv.transpose();
+        normal4 *= forward_SR_inv.transpose();
         cout << "==Global ray4: " << ray4 << endl;
         cout << "==Global normal4: " << normal4 << endl;
 

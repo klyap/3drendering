@@ -515,10 +515,10 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = backward * ray4;
+        ray4 = forward * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = backward_SR * normal4;
+        normal4 = forward_SR * normal4;
         cout << "==Global ray4: " << ray4 << endl;
         cout << "==Global normal4: " << normal4 << endl;
 

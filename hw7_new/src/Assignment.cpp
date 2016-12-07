@@ -398,7 +398,8 @@ namespace Assignment {
           0, 0, 1, 0,
           0, 0, 0, 1;
 
-        for (int i = transformation_stack.size(); i > 0; i--){
+        //for (int i = transformation_stack.size(); i > 0; i--){
+        for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
           cout << "Transform stack = " << transform << endl;
           forward *= transform;
@@ -412,7 +413,7 @@ namespace Assignment {
         // Initial coeff scaling
         Vector3f ini_scale_coords = prm->getCoeff();
         Transformation ini_scale =
-           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
         Matrix4f transform = makeTransform(ini_scale);
         forward *= transform;
         forward_SR *= transform;

@@ -398,7 +398,7 @@ namespace Assignment {
           0, 0, 1, 0,
           0, 0, 0, 1;
 
-        for (int i = transformation_stack.size(); i < 0; i--){
+        for (int i = transformation_stack.size(); i > 0; i--){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||

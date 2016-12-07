@@ -387,16 +387,16 @@ namespace Assignment {
 
         Matrix4f forward;
         forward <<
-          1, 1, 1, 1,
-          1, 1, 1, 1,
-          1, 1, 1, 1,
-          1, 1, 1, 1;
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1;
         Matrix4f forward_SR;
         forward_SR <<
-            1, 1, 1, 1,
-            1, 1, 1, 1,
-            1, 1, 1, 1,
-            1, 1, 1, 1;
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1;
 
         for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));

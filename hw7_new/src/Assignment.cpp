@@ -459,7 +459,7 @@ namespace Assignment {
           0, 0, 0, 1;
 
         for (int i = 0; i < transformation_stack.size(); i++){
-          Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-i));
+          Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-1-i));
           cout << "Transform stack = " << transform << endl;
           backward *= transform;
           if (transformation_stack.at(i).type == SCALE ||

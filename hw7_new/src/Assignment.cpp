@@ -60,7 +60,8 @@ namespace Assignment {
 
       if (type == TRANS){
         cout << "Transform stack: trans " << type << endl;
-        transform << 1, 0, 0, t.trans[0],
+        transform <<
+                 1, 0, 0, t.trans[0],
                  0, 1, 0, t.trans[1],
                  0, 0, 1, t.trans[2],
                  0, 0, 0, 1;
@@ -118,17 +119,6 @@ namespace Assignment {
 
     float sq_io(float x, float y, float z, float e, float n){
       float test = pow(pow(x * x, 1/e) + pow(y * y, 1/e), e/n) + pow(z*z, 1/n) - 1;
-      // cout << "sq_io: " << test << endl;
-      // if (test < 0){
-      //   // inside object
-      //   return -1;
-      // } else if (test > 0){
-      //   //outside object
-      //   return 1;
-      // }
-      // //on surface
-
-      //return 0;
 
       return test;
     }
@@ -155,14 +145,6 @@ namespace Assignment {
         if (ren->getType() == PRM) {
             Primitive *prm = dynamic_cast<Primitive*>(ren);
 
-            /* TODO
-             *
-             *     Apply inverse of the transformations passed in through
-             * transformation_stack to (x, y, z) and perform the IO test
-             * oulined in the lecture notes. If the point is inside the
-             * primitive, return true. Otherwise return false
-             **/
-
              Vector4f coords(x, y, z, 1);
              Vector3f ini_scale_coords = prm->getCoeff();
 
@@ -175,8 +157,6 @@ namespace Assignment {
              for (int i = 0; i < transformation_stack.size(); i++){
                Matrix4f transform = makeInvTransform(transformation_stack.at(i));
                coords = transform * coords;
-
-               cout << "sq_io transform stack: " << transform << endl;
              }
 
              // Do in/out test
@@ -184,7 +164,6 @@ namespace Assignment {
                prm->getExp0(), prm->getExp1());
              cout << "sq_io returned: " << check_inside << endl;
              if (check_inside < 0){
-               cout << "check inside is -" << endl;
                return true;
              }
             return false;
@@ -266,7 +245,6 @@ namespace Assignment {
                         glTranslatef(test_x, test_y, test_z);
                         glutWireSphere(0.05, 4, 4);
                         glPopMatrix();
-                        cout << "IOTEST is true" << endl;
                     }
                 }
             }
@@ -303,7 +281,6 @@ namespace Assignment {
     }
 
     Vector3f getRay(float t, Vector3f av, Vector3f bv){
-      cout << "Got ray: " << av * t + bv << endl;
       return av * t + bv;
     }
 
@@ -409,7 +386,6 @@ namespace Assignment {
         // Got to "leaf" of recursion; do stuff here
         cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
-
 
         // Apply all inverse transforms to av
         // Apply only inverse scales and rotates to bv
@@ -518,7 +494,7 @@ namespace Assignment {
         ray4 = backward * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = backward_SR.transpose() * normal4;
+        normal4 = forward_SR.transpose() * normal4;
         cout << "== Position transformed back out: " << ray4 << endl;
         cout << "== normal4 transformed back out: " << normal4 << endl;
 

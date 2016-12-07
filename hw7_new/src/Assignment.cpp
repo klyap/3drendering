@@ -395,7 +395,6 @@ namespace Assignment {
         for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
           forward *= transform;
-          //av4 = av4.transpose() * transform;
           if (transformation_stack.at(i).type == SCALE ||
               transformation_stack.at(i).type == ROTATE){
             // Add to SR
@@ -440,12 +439,21 @@ namespace Assignment {
         normal = av * grad_sq_io(ray[0], ray[1], ray[2],
           prm->getExp0(), prm->getExp1());
 
-        // Transform position and normal back into normal coords
+        // Pull into Vec4 for 4x4 rotation matrices
+        Vector4f ray4(ray[0], ray[1], ray[2], 1);
+        Vector4f normal4(normal[0], normal[1], normal[2], 1);
 
+        // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
-        ray *= forward_inv.transpose();
+        ray4 *= forward_inv.transpose();
         Matrix4f forward_SR_inv = forward_SR.inverse();
         normal *= forward_SR_inv.transpose();
+        cout << "==Global ray4: " << ray4 << endl;
+        cout << "==Global normal4: " << normal4 << endl;
+
+        // Put back into vec3
+        ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
+        normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
 
         cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;

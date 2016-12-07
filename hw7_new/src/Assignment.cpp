@@ -415,7 +415,7 @@ namespace Assignment {
         cout << "forward_SR" << forward_SR << endl;
 
         // Position (all transforms)
-        av4 = av4.transpose() * forward_SR;
+        av4 = av4.transpose() * forward;
         cout << "ray4 origin after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
@@ -423,12 +423,12 @@ namespace Assignment {
         cout << "av origin after all transforms: " << av << endl;
 
         // Direction/normal (SR only)
-        bv4 = bv4.transpose() * forward;
-        cout << "ray4 origin after all transforms: " << bv4 << endl;
+        bv4 = bv4.transpose() * forward_SR;
+        cout << "ray4 after all transforms: " << bv4 << endl;
         bv[0] = bv4[0];
         bv[1] = bv4[1];
         bv[2] = bv4[2];
-        cout << "av origin after all transforms: " << bv << endl;
+        cout << "bv after all transforms: " << bv << endl;
 
         // Do newton computations in superquadric space (or whatever it's called)
         pair<Vector3f, Vector3f> new_ray_t =

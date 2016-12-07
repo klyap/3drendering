@@ -296,7 +296,7 @@ namespace Assignment {
 
       if (d < 0){
         cout << "== d < 0 ==" << d << endl;
-        return make_pair(t_chosen, Vector3f(0,0,0));
+        return make_pair(Vector3f(0,0,0), Vector3f(0,0,0));
       } else if (tminus == tplus){
         cout << "== equal ==" << endl;
         t_chosen = tminus;

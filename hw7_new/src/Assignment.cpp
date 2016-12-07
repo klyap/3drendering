@@ -144,6 +144,8 @@ namespace Assignment {
              for (int i = 0; i < transformation_stack.size(); i++){
                Matrix4f transform = makeTransform(transformation_stack.at(i));
                coords = coords.transpose() * transform;
+
+               cout << "sq_io transform stack: " << transform << endl;
              }
 
              // Do in/out test

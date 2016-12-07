@@ -519,13 +519,13 @@ namespace Assignment {
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = forward_SR.transpose() * normal4;
-        cout << "==Global ray4: " << ray4 << endl;
-        cout << "==Global normal4: " << normal4 << endl;
-
-
+        cout << "== ray4 for this prm: " << ray4 << endl;
+        cout << "== normal4 for this prm: " << normal4 << endl;
 
         // Return: pick minimum distance from camera to new intersection position
         float d_new = (ray - cam_pos).norm();
+        cout << "d_new: " << d_new << endl;
+        cout << "d old: " << d << endl;
         if (d_new < d){
           // Update new minimum a and b
           d = d_new;

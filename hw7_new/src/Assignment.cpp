@@ -378,10 +378,10 @@ namespace Assignment {
         // Apply all inverse transforms to av
         // Apply only inverse scales and rotates to bv
 
-        // Vector4f av4(av[0],av[1],av[2],1);
-        // av4 = av4.transpose() * transform;
+        Vector4f av4(av[0],av[1],av[2],1);
+        //av4 = av4.transpose() * transform;
         // cout << "av4 origin after init scale: " << av4 << endl;
-        // Vector4f bv4(bv[0],bv[1],bv[2],1);
+        Vector4f bv4(bv[0],bv[1],bv[2],1);
         // bv4 = bv4.transpose() * transform;
         // cout << "bv4 origin after init scale: " << bv4 << endl;
 

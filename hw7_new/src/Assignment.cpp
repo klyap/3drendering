@@ -362,15 +362,18 @@ namespace Assignment {
     }
 
     void recurse_findIntersection(
-      float &t, Vector3f &ray, Vector3f &normal,
+      float &d, Vector3f &ray, Vector3f &normal,
       Vector3f av, Vector3f bv,
       Renderable *ren,
       vector<Transformation> &transformation_stack){
+
+      Vector3f cam_pos = bv;
 
       if (ren->getType() == PRM) {
         // Got to "leaf" of recursion; do stuff here
         cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
+
 
         // Apply all inverse transforms to av
         // Apply only inverse scales and rotates to bv
@@ -451,10 +454,17 @@ namespace Assignment {
         cout << "==Global ray4: " << ray4 << endl;
         cout << "==Global normal4: " << normal4 << endl;
 
-        // Put back into vec3
-        ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
-        normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
 
+
+        // Return: pick minimum distance from camera to new intersection position
+        float d_new = (ray - cam_pos).norm();
+        if (d_new < d){
+          // Update new minimum a and b
+          d = d_new;
+          // Put back into vec3
+          ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
+          normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
+        }
 
         // "Return": Set t and ray
         // Choose smallest positive t wrt this primitive <---- NO!
@@ -465,15 +475,6 @@ namespace Assignment {
         // if (t == new_t){
         //   ray = new_position;
         // }
-
-        // Get normal from position
-        // Vector3f gradient = grad_sq_io(ray[0], ray[1], ray[2],
-        //    prm->getExp0(), prm->getExp1());
-        // normal = gradient;
-
-        // normal = prm->getNormal(ray);
-
-
 
 
         cout << "==Global t: " << t << endl;
@@ -499,8 +500,8 @@ namespace Assignment {
              }
              // Updates referenced t and ray with min + t
              // and the associated Vec3f
-              recurse_findIntersection(t, ray, normal,
-               av, bv,
+              recurse_findIntersection(d, ray, normal,
+               av, cam_pos,
                Renderable::get(child_it.second.name),
                transformation_stack);
              transformation_stack.erase(
@@ -553,10 +554,10 @@ namespace Assignment {
 
       // the "return" values
       vector<Transformation> transformation_stack;
-      float t = 1000000000000;
+      float d = 1000000000000; // Min distance from camera
       Vector3f ray;
       Vector3f normal;
-      recurse_findIntersection(t, ray, normal,
+      recurse_findIntersection(d, ray, normal,
         av, bv, ren, transformation_stack);
 
       cout << "==Returned ray origin: " << ray << endl;

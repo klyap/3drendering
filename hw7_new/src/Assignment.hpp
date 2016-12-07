@@ -8,6 +8,7 @@ struct Camera;
 class Scene;
 
 namespace Assignment {
+    Matrix4f makeInvTransform(Transformation t);
     Matrix4f makeTransform(Transformation t);
     Matrix4f makeRotation(Vector4f unit_q);
     float sq_io(float x, float y, float z, float e, float n);

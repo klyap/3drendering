@@ -60,6 +60,37 @@ namespace Assignment {
 
       if (type == TRANS){
         cout << "Transform stack: trans " << type << endl;
+        transform << 1, 0, 0, t.trans[0],
+                 0, 1, 0, t.trans[1],
+                 0, 0, 1, t.trans[2],
+                 0, 0, 0, 1;
+      }
+      else if (type == SCALE){
+        cout << "Transform scale: scale " << type << endl;
+        transform <<
+                 t.trans[0], 0, 0, 0,
+                 0, t.trans[1], 0, 0,
+                 0, 0, t.trans[2], 0,
+                 0, 0, 0, 1;
+
+      } else if (type == ROTATE){
+        // Given coords in quaternion
+        // Convert to normal axes and invert
+        cout << "Transform scale: rotate " << type << endl;
+        //makeRotateMat(float *matrix, float x, float y, float z, float angle);
+        transform = makeRotationQuat(t.trans);
+      }
+
+      cout << transform << endl;
+      return transform;
+    }
+
+    Matrix4f makeInvTransform(Transformation t) {
+      TransformationType type = t.type;
+      Matrix4f transform(4,4);
+
+      if (type == TRANS){
+        cout << "Transform stack: trans " << type << endl;
         transform << 1, 0, 0, -1.0 * t.trans[0],
                  0, 1, 0, -1.0 * t.trans[1],
                  0, 0, 1, -1.0 * t.trans[2],
@@ -137,12 +168,12 @@ namespace Assignment {
 
              Transformation ini_scale =
                 Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
-             Matrix4f transform = makeTransform(ini_scale);
+             Matrix4f transform = makeInvTransform(ini_scale);
              coords = coords.transpose() * transform;
              cout << "coords after init scale: " << coords << endl;
 
              for (int i = 0; i < transformation_stack.size(); i++){
-               Matrix4f transform = makeTransform(transformation_stack.at(i));
+               Matrix4f transform = makeInvTransform(transformation_stack.at(i));
                coords = transform * coords;
 
                cout << "sq_io transform stack: " << transform << endl;
@@ -404,7 +435,7 @@ namespace Assignment {
 
         //for (int i = transformation_stack.size(); i > 0; i--){
         for (int i = 0; i < transformation_stack.size(); i++){
-          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          Matrix4f transform = makeInvTransform(transformation_stack.at(i));
           cout << "Transform stack = " << transform << endl;
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
@@ -414,11 +445,36 @@ namespace Assignment {
           }
         }
 
+        Matrix4f backward;
+        backward <<
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1;
+        Matrix4f backward_SR;
+        backward_SR <<
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1;
+
+        for (int i = transformation_stack.size(); i > 0; i--){
+          Matrix4f transform = makeTransform(transformation_stack.at(i));
+          cout << "Transform stack = " << transform << endl;
+          backward *= transform;
+          if (transformation_stack.at(i).type == SCALE ||
+              transformation_stack.at(i).type == ROTATE){
+            // Add to SR
+            backward_SR *= transform;
+          }
+        }
+
+
         // Initial coeff scaling
         Vector3f ini_scale_coords = prm->getCoeff();
         Transformation ini_scale =
            Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
-        Matrix4f transform = makeTransform(ini_scale);
+        Matrix4f transform = makeInvTransform(ini_scale);
         forward *= transform;
         forward_SR *= transform;
 
@@ -459,10 +515,10 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = ray4.transpose() * forward_inv; // TODO: swap order
+        ray4 = backward * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = normal4.transpose() * forward_SR_inv;// TODO: swap order
+        normal4 = backward_SR * normal4;
         cout << "==Global ray4: " << ray4 << endl;
         cout << "==Global normal4: " << normal4 << endl;
 

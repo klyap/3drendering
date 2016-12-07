@@ -458,7 +458,7 @@ namespace Assignment {
           0, 0, 1, 0,
           0, 0, 0, 1;
 
-        for (int i = transformation_stack.size(); i > 0; i--){
+        for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
           cout << "Transform stack = " << transform << endl;
           backward *= transform;

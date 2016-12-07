@@ -288,7 +288,10 @@ namespace Assignment {
       float tplus = getTplus(a, b, c);
       float d =  b*b - 4.0*a*c; // discriminant
       float t_chosen = 0.0;
+
       Vector3f ray = Vector3f(0,0,0);
+      Vector3f normal = Vector3f(0,0,0);;
+
       cout << "tminus = " << tminus << " tplus = " << tplus << endl;
 
       if (d < 0){
@@ -331,7 +334,7 @@ namespace Assignment {
       //   return Vector3f(0,0,0);
       // }
       cout << "== newton didn't go into any tests ==" << endl;
-      return make_pair(t_chosen, ray); // should default to Vector3f(0,0,0)
+      return make_pair(normal, ray); // should default to Vector3f(0,0,0)
     }
 
     // Gets final t; returns normal and position
@@ -422,7 +425,7 @@ namespace Assignment {
         cout << "av origin after all transforms: " << bv << endl;
 
         // Do newton computations in superquadric space (or whatever it's called)
-        pair<float, Vector3f> new_ray_t =
+        pair<Vector3f, Vector3f> new_ray_t =
           newton(av, bv, prm->getExp0(), prm->getExp1());
         Vector3f new_normal = new_ray_t.first;
         Vector3f new_position = new_ray_t.second;

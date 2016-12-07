@@ -435,12 +435,12 @@ namespace Assignment {
 
         // Transform position and normals back out of superquadric space
         // Pull into Vec4 for 4x4 rotation matrices
-        Vector4f ray4(ray[0], ray[1], ray[2], 1);
-        Vector4f normal4(normal[0], normal[1], normal[2], 1);
+        Vector4f ray4(new_position[0], new_position[1], new_position[2], 1);
+        Vector4f normal4(new_normal[0], new_normal[1], new_normal[2], 1);
 
         // Transform position and normal back into normal coords
         Matrix4f forward_inv = forward.inverse();
-        Matrix4f forward_inv_t = forward_inv.transpose();
+        //Matrix4f forward_inv_t = forward_inv.transpose();
         ray4 = forward_inv_t * ray4;
         Matrix4f forward_SR_inv = forward_SR.inverse();
         Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
@@ -456,12 +456,12 @@ namespace Assignment {
         // "Return": Set t and ray
         // Choose smallest positive t wrt this primitive <---- NO!
         // Instead, choose smallest distance to camera
-        new_t = fmax(0.0, new_t);
-        t = fmin(t, new_t);
-
-        if (t == new_t){
-          ray = new_position;
-        }
+        // new_t = fmax(0.0, new_t);
+        // t = fmin(t, new_t);
+        //
+        // if (t == new_t){
+        //   ray = new_position;
+        // }
 
         // Get normal from position
         // Vector3f gradient = grad_sq_io(ray[0], ray[1], ray[2],

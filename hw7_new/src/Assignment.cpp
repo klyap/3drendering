@@ -477,7 +477,7 @@ namespace Assignment {
         // }
 
 
-        cout << "==Global t: " << t << endl;
+        //cout << "==Global t: " << t << endl;
         cout << "==Global ray: " << ray << endl;
         cout << "==Global normal: " << normal << endl;
 

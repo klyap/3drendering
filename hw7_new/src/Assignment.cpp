@@ -400,6 +400,7 @@ namespace Assignment {
 
         for (int i = transformation_stack.size(); i > 0; i--){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
+          cout << "Transform stack = " << transform << endl;
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
               transformation_stack.at(i).type == ROTATE){

@@ -496,8 +496,8 @@ namespace Assignment {
 
         //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_inv.transpose() * normal4.normalized();
-
+        normal4 = forward_inv.transpose() * normal4;
+        normal4.normalize();
         // Don't need this since it's inside the transform matrices
         // already
         // Transformation last_scale =

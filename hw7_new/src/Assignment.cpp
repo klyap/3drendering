@@ -411,7 +411,7 @@ namespace Assignment {
 
         //for (int i = transformation_stack.size(); i > 0; i--){
         for (int i = 0; i < transformation_stack.size(); i++){
-          Matrix4f transform = makeInvTransform(transformation_stack.at(i));
+          Matrix4f transform = makeTransform(transformation_stack.at(i));
           cout << "Transform stack = " << transform << endl;
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
@@ -421,36 +421,36 @@ namespace Assignment {
           }
         }
 
-        Matrix4f backward;
-        backward <<
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1;
-        Matrix4f backward_SR;
-        backward_SR <<
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1;
-
-        for (int i = 0; i < transformation_stack.size(); i++){
-          Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-1-i));
-          cout << "Transform stack = " << transform << endl;
-          backward *= transform;
-          if (transformation_stack.at(i).type == SCALE ||
-              transformation_stack.at(i).type == ROTATE){
-            // Add to SR
-            backward_SR *= transform;
-          }
-        }
+        // Matrix4f backward;
+        // backward <<
+        //   1, 0, 0, 0,
+        //   0, 1, 0, 0,
+        //   0, 0, 1, 0,
+        //   0, 0, 0, 1;
+        // Matrix4f backward_SR;
+        // backward_SR <<
+        //   1, 0, 0, 0,
+        //   0, 1, 0, 0,
+        //   0, 0, 1, 0,
+        //   0, 0, 0, 1;
+        //
+        // for (int i = 0; i < transformation_stack.size(); i++){
+        //   Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-1-i));
+        //   cout << "Transform stack = " << transform << endl;
+        //   backward *= transform;
+        //   if (transformation_stack.at(i).type == SCALE ||
+        //       transformation_stack.at(i).type == ROTATE){
+        //     // Add to SR
+        //     backward_SR *= transform;
+        //   }
+        // }
 
 
         // Initial coeff scaling
         Vector3f ini_scale_coords = prm->getCoeff();
         Transformation ini_scale =
            Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
-        Matrix4f transform = makeInvTransform(ini_scale);
+        Matrix4f transform = makeTransform(ini_scale);
         forward *= transform;
         forward_SR *= transform;
 
@@ -458,8 +458,9 @@ namespace Assignment {
         cout << "forward_SR" << forward_SR << endl;
 
         // Direction/normal (SR only)
-        av4 = forward_SR * av4;
-        cout << "ray4 origin after all transforms: " << av4 << endl;
+        Matrix4f forward_SR_inv = forward_SR.inverse();
+        av4 = forward_SR_inv * av4;
+        cout << "direction after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
         av[2] = av4[2];
@@ -467,8 +468,9 @@ namespace Assignment {
 
 
         // Position (all transforms)
-        bv4 = forward * bv4;
-        cout << "ray4 after all transforms: " << bv4 << endl;
+        Matrix4f forward_inv = forward.inverse();
+        bv4 = forward_inv * bv4;
+        cout << "position after all transforms: " << bv4 << endl;
         bv[0] = bv4[0];
         bv[1] = bv4[1];
         bv[2] = bv4[2];
@@ -489,12 +491,12 @@ namespace Assignment {
         Vector4f normal4(new_normal[0], new_normal[1], new_normal[2], 1);
 
         // Transform position and normal back into normal coords
-        Matrix4f forward_inv = forward.inverse();
+        //Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = backward * ray4;
-        Matrix4f forward_SR_inv = forward_SR.inverse();
+        ray4 = forward * ray4;
+        //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_SR.transpose() * normal4;
+        normal4 = forward_inv.transpose() * normal4;
 
         Transformation last_scale =
            Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);

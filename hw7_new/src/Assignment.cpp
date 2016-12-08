@@ -498,11 +498,13 @@ namespace Assignment {
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = forward_inv.transpose() * normal4;
 
-        Transformation last_scale =
-           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
-        Matrix4f transform = makeTransform(last_scale);
-        backward *= transform;
-        backward_SR *= transform;
+        // Don't need this since it's inside the transform matrices
+        // already 
+        // Transformation last_scale =
+        //    Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
+        // Matrix4f transform = makeTransform(last_scale);
+        // backward *= transform;
+        // backward_SR *= transform;
 
         cout << "== Position transformed back out: " << ray4 << endl;
         cout << "== normal4 transformed back out: " << normal4 << endl;

@@ -409,6 +409,14 @@ namespace Assignment {
           0, 0, 1, 0,
           0, 0, 0, 1;
 
+        // Initial coeff scaling
+        Vector3f ini_scale_coords = prm->getCoeff();
+        Transformation ini_scale =
+           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
+        Matrix4f transform = makeTransform(ini_scale);
+        forward *= transform;
+        forward_SR *= transform;
+
         //for (int i = transformation_stack.size(); i > 0; i--){
         for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
@@ -444,15 +452,6 @@ namespace Assignment {
         //     backward_SR *= transform;
         //   }
         // }
-
-
-        // Initial coeff scaling
-        Vector3f ini_scale_coords = prm->getCoeff();
-        Transformation ini_scale =
-           Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
-        Matrix4f transform = makeTransform(ini_scale);
-        forward *= transform;
-        forward_SR *= transform;
 
         cout << "forward" << forward << endl;
         cout << "forward_SR" << forward_SR << endl;
@@ -493,13 +492,14 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         //Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        ray4 = forward * ray4;
+        //ray4 = forward * ray4;
+
         //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = forward_inv.transpose() * normal4;
 
         // Don't need this since it's inside the transform matrices
-        // already 
+        // already
         // Transformation last_scale =
         //    Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1], ini_scale_coords[2],1.0);
         // Matrix4f transform = makeTransform(last_scale);

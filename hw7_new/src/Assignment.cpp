@@ -496,7 +496,7 @@ namespace Assignment {
 
         //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_inv.transpose() * normal4.normalize();
+        normal4 = forward_inv.transpose() * normal4.normalized();
 
         // Don't need this since it's inside the transform matrices
         // already

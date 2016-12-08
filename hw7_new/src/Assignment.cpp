@@ -365,8 +365,8 @@ namespace Assignment {
         g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
         t = t - g/gprime;
 
-        cout << "==NEW g prime: " << gprime << " g: " << g << endl;
-        cout << "==NEW t: " << t << endl;
+        // cout << "==NEW g prime: " << gprime << " g: " << g << endl;
+        // cout << "==NEW t: " << t << endl;
       }
       cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
       cout << "==FINAL t: " << t << endl;
@@ -463,7 +463,7 @@ namespace Assignment {
         av[0] = av4[0];
         av[1] = av4[1];
         av[2] = av4[2];
-        cout << "av origin after all transforms: " << av << endl;
+        //cout << "av origin after all transforms: " << av << endl;
 
 
         // Position (all transforms)
@@ -473,7 +473,7 @@ namespace Assignment {
         bv[0] = bv4[0];
         bv[1] = bv4[1];
         bv[2] = bv4[2];
-        cout << "bv after all transforms: " << bv << endl;
+        //cout << "bv after all transforms: " << bv << endl;
 
         // Do newton computations in superquadric space (or whatever it's called)
         pair<Vector3f, Vector3f> new_ray_t =
@@ -481,8 +481,8 @@ namespace Assignment {
 
         Vector3f new_normal = new_ray_t.first;
         Vector3f new_position = new_ray_t.second;
-        cout << "==Computed position: " << new_position << endl; // New position
-        cout << "==Computed normal: " << new_normal << endl; // New normal
+        cout << "==Output position: " << new_position << endl; // New position
+        cout << "==Output normal: " << new_normal << endl; // New normal
 
         // Transform position and normals back out of superquadric space
         // Pull into Vec4 for 4x4 rotation matrices
@@ -492,11 +492,11 @@ namespace Assignment {
         // Transform position and normal back into normal coords
         //Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();
-        //ray4 = forward * ray4;
+        ray4 = forward * ray4;
 
         //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
-        normal4 = forward_inv.transpose() * normal4;
+        normal4 = forward_inv.transpose() * normal4.normalize();
 
         // Don't need this since it's inside the transform matrices
         // already

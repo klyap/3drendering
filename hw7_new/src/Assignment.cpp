@@ -375,7 +375,7 @@ namespace Assignment {
     }
 
     void recurse_findIntersection(
-      float &d, Vector3f &ray, Vector3f &normal,
+      float &d, Vector3f &ray, Vector3f &normal, Primitive* p,
       Vector3f av, Vector3f bv,
       Renderable *ren,
       vector<Transformation> &transformation_stack){
@@ -429,30 +429,6 @@ namespace Assignment {
           }
         }
 
-        // Matrix4f backward;
-        // backward <<
-        //   1, 0, 0, 0,
-        //   0, 1, 0, 0,
-        //   0, 0, 1, 0,
-        //   0, 0, 0, 1;
-        // Matrix4f backward_SR;
-        // backward_SR <<
-        //   1, 0, 0, 0,
-        //   0, 1, 0, 0,
-        //   0, 0, 1, 0,
-        //   0, 0, 0, 1;
-        //
-        // for (int i = 0; i < transformation_stack.size(); i++){
-        //   Matrix4f transform = makeTransform(transformation_stack.at(transformation_stack.size()-1-i));
-        //   cout << "Transform stack = " << transform << endl;
-        //   backward *= transform;
-        //   if (transformation_stack.at(i).type == SCALE ||
-        //       transformation_stack.at(i).type == ROTATE){
-        //     // Add to SR
-        //     backward_SR *= transform;
-        //   }
-        // }
-
         cout << "forward" << forward << endl;
         cout << "forward_SR" << forward_SR << endl;
 
@@ -497,7 +473,7 @@ namespace Assignment {
         //Matrix4f forward_SR_inv = forward_SR.inverse();
         //Matrix4f forward_SR_inv_t = forward_SR_inv.transpose();
         normal4 = forward_inv.transpose() * normal4;
-        
+
         // Don't need this since it's inside the transform matrices
         // already
         // Transformation last_scale =
@@ -516,9 +492,12 @@ namespace Assignment {
         if (d_new < d){
           // Update new minimum a and b
           d = d_new;
+          
           // Put back into vec3
           ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
           normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
+          p = prm;
+
           cout << "found new min d: " << d << endl;
           cout << "pos: " << ray << endl;
           cout << "normal: " << normal << endl;
@@ -545,7 +524,7 @@ namespace Assignment {
              }
              // Updates referenced t and ray with min + t
              // and the associated Vec3f
-              recurse_findIntersection(d, ray, normal,
+              recurse_findIntersection(d, ray, normal, prm,
                av, cam_pos,
                Renderable::get(child_it.second.name),
                transformation_stack);
@@ -564,7 +543,7 @@ namespace Assignment {
       }
     }
 
-    Ray findIntersection(const Ray &camera_ray) {
+    pair<Ray, Primitive*> findIntersection(const Ray &camera_ray) {
 
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;
@@ -600,12 +579,13 @@ namespace Assignment {
       float d = 1000000000000; // Min distance from camera
       Vector3f ray;
       Vector3f normal;
-      recurse_findIntersection(d, ray, normal,
+      Primitive* prm;
+      recurse_findIntersection(d, ray, normal, prm,
         av, bv, ren, transformation_stack);
 
       cout << "==Returned ray origin: " << ray << endl;
-      cout << "==Returned ray dir/normal: " << ray << endl;
-
+      cout << "==Returned ray dir/normal: " << normal << endl;
+      cout << "==Returned primitive: " << prm->getSpecular() << endl;
 
       // Package into Ray obj
       intersection_ray.origin_x = ray[0];
@@ -615,7 +595,7 @@ namespace Assignment {
       intersection_ray.direction_y = normal[1];
       intersection_ray.direction_z = normal[2];
 
-      return intersection_ray;
+      return make_pair(intersection_ray, prm);
     }
 
     void drawIntersectTest(Camera *camera) {
@@ -665,16 +645,136 @@ namespace Assignment {
     }
 
     /* Assignment Part B */
+    // n = normal vector of x, y, z
+    // e = camera position
+    Vector3d lighting_model(const Vertex &Pv, const Vertex &nv, const Material &material,
+                        const vector<Light> &lights, const MatrixXd &em){
+      // Empty vector
+      Vector3d empty(0,0,0);
+      Vector3d ones(1,1,1);
+
+      // Convert to vector
+      Vector3d P(Pv.x, Pv.y, Pv.z); // point position
+      Vector3d n(nv.x, nv.y, nv.z); // surface normal
+      Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
+
+      Vector3d cd(material.diffuse.r, material.diffuse.g, material.diffuse.b);
+      Vector3d ca(material.ambient.r, material.ambient.g, material.ambient.b);
+      Vector3d cs(material.specular.r, material.specular.g, material.specular.b);
+      double p = material.shininess;
+
+      Vector3d diffuse_sum(0,0,0);
+      Vector3d specular_sum(0,0,0);
+
+      Vector3d e_direction = (e - P).normalized();
+
+      Vector3d lp(0,0,0); // light position
+      Vector3d lc(0,0,0); // light color
+
+      Vector3d l_direction, l_diffuse, l_specular;
+
+      for (auto &l : lights){
+        lp << l.x, l.y, l.z;
+        lc << l.rgb.r, l.rgb.g, l.rgb.b;
+
+        // Include attenuation
+        // Distance between light and point
+        double d = (lp - P).norm();
+        lc = lc * (1.0 / (1 + l.attenuation * d * d));
+
+        // Find diffuse
+        Vector3d l_direction = (lp - P).normalized();
+        l_diffuse = lc * max(0.0, n.dot(l_direction));
+        diffuse_sum += l_diffuse;
+
+        // Find specular
+        l_specular = lc * pow(max(0.0,
+          n.dot((e_direction + l_direction).normalized())), p);
+        specular_sum += l_specular;
+      }
+
+      //component-wise min function and component-wise product
+      Vector3d c = ones.cwiseMin(ca
+                    + diffuse_sum.cwiseProduct(cd)
+                    + specular_sum.cwiseProduct(cs));
+      return c;
+    }
+
+    // n = normal vector of x, y, z
+    // e = camera position
+    Vector3d dummylighting(const Vector3f &Pv, const Vector3f &nv,
+      const Primitive* prm, const vector<PointLight> &lights, const MatrixXd &em){
+
+      //printInfo(const Renderable* ren, int indent)
+      printInfo(prm, 2)
+
+      // Empty vector
+      Vector3d empty(0,0,0);
+      Vector3d ones(1,1,1);
+
+      // Convert to vector
+      Vector3d P(Pv.x, Pv.y, Pv.z); // point position
+      Vector3d n(nv.x, nv.y, nv.z); // surface normal
+      Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
+
+      return P;
+    }
+
 
     /* Ray traces the scene. */
     void raytrace(Camera camera, Scene scene) {
         // LEAVE THIS UNLESS YOU WANT TO WRITE YOUR OWN OUTPUT FUNCTION
         PNGMaker png = PNGMaker(XRES, YRES);
 
+        // Assume that camera never moves
+        Vector3f e1(0, 0, -1); // Camera direction
+        Vector3f e2(1, 0, 0); // Comes out right of camera
+        Vector3f e3(0, 1, 0); // Comes out top of camera
+
         // REPLACE THIS WITH YOUR CODE
         for (int i = 0; i < XRES; i++) {
             for (int j = 0; j < YRES; j++) {
-                png.setPixel(i, j, 1.0, 1.0, 1.0);
+              float h = 2.0 * camera->near * tan(camera->fov / 2);
+              float w = camera->aspect * h;
+
+              float xi = (i - XRES/2.0) * w/XRES;
+              float yj = (j - YRES/2.0) * h/YRES;
+
+              // av = direction, bv = position
+              Vector3f av = n * e1 + xi * e2 + yj * e3;
+
+              // a = intersection point - light position
+              // light position = scene->lights[0].position (know there's only 1 light)
+
+              // Find intersection point p
+              Ray camera_ray;
+              camera_ray.origin_x = camera->getPosition()[0];
+              camera_ray.origin_y = camera->getPosition()[1];
+              camera_ray.origin_z = camera->getPosition()[2];
+              camera_ray.direction_x = av[0];
+              camera_ray.direction_y = av[1];
+              camera_ray.direction_z = av[2];
+
+              pair<Ray, Primitive*> intersection_ray = findIntersection(camera_ray);
+
+              av[0] = intersection_ray.first.direction_x; // Normal (ie vn)
+              av[1] = intersection_ray.first.direction_y;
+              av[2] = intersection_ray.first.direction_z;
+              Vec3f bv(intersection_ray.first.origin_x, // Point (ie v)
+                  intersection_ray.first.origin_y,
+                  intersection_ray.first.origin_z);
+              Primitive * prm = intersection_ray.second;
+
+              if (prm == NULL){
+                // Camera doesn't intersect object so no shine or shadow
+                return;
+              }
+
+              Vector3f c =
+                //lighting_model(b, av, prm, lights, e); // Do intersect with lights
+                dummylighting(bv, av, prm, lights, e);
+
+              png.setPixel(i, j, c[0] * 255, c[0] * 255, c[0] * 255);
             }
         }
 

@@ -471,6 +471,12 @@ namespace Assignment {
         cout << "== Before Position transformed back out: " << ray4 << endl;
         cout << "== Before normal4 transformed back out: " << normal4 << endl;
 
+        // Catch when there is no intersection (default return = (0,0,0))
+        if (new_normal[0] == 0 && new_normal[1] == 0 && new_normal[2] == 0 &&
+            new_position[0] == 0 && new_position[1] == 0 && new_position[2] == 0){
+            return;
+        }
+
         // Transform position and normal back into normal coords
         //Matrix4f forward_inv = forward.inverse();
         //Matrix4f forward_inv_t = forward_inv.transpose();

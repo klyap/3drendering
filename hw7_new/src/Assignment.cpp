@@ -571,7 +571,7 @@ namespace Assignment {
       }
 
        if (ren == NULL) {
-           return intersection_ray;
+           return make_pair(intersection_ray, NULL);
        }
 
       // the "return" values
@@ -623,7 +623,8 @@ namespace Assignment {
         // camera_ray.direction_y = cam_dir[1];
         // camera_ray.direction_z = cam_dir[2];
 
-        Ray intersection_ray = findIntersection(camera_ray);
+        pair<Ray, Primitive*> ray_prm = findIntersection(camera_ray);
+        Ray intersection_ray = findIntersection.first;
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);
@@ -706,7 +707,7 @@ namespace Assignment {
       const Primitive* prm, const vector<PointLight> &lights, const MatrixXd &em){
 
       //printInfo(const Renderable* ren, int indent)
-      printInfo(prm, 2)
+      printInfo(prm, 2);
 
       // // Empty vector
       // Vector3d empty(0,0,0);
@@ -755,7 +756,8 @@ namespace Assignment {
               camera_ray.direction_y = av[1];
               camera_ray.direction_z = av[2];
 
-              pair<Ray, Primitive*> intersection_ray = findIntersection(camera_ray);
+              pair<Ray, Primitive*> ray_prm = findIntersection(camera_ray);
+              Ray intersection_ray = ray_prm.first;
 
               av[0] = intersection_ray.first.direction_x; // Normal (ie vn)
               av[1] = intersection_ray.first.direction_y;

@@ -375,7 +375,7 @@ namespace Assignment {
     }
 
     void recurse_findIntersection(
-      float &d, Vector3f &ray, Vector3f &normal, Primitive* p,
+      float &d, Vector3f &ray, Vector3f &normal, Primitive** p,
       Vector3f av, Vector3f bv,
       Renderable *ren,
       vector<Transformation> &transformation_stack){
@@ -496,7 +496,7 @@ namespace Assignment {
           // Put back into vec3
           ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
           normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
-          p = prm;
+          *p = prm;
 
           cout << "found new min d: " << d << endl;
           cout << "pos: " << ray << endl;
@@ -581,7 +581,7 @@ namespace Assignment {
       Vector3f ray;
       Vector3f normal;
       Primitive* prm;
-      recurse_findIntersection(d, ray, normal, prm,
+      recurse_findIntersection(d, ray, normal, &prm,
         av, bv, ren, transformation_stack);
 
       cout << "==Returned ray origin: " << ray << endl;

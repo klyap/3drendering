@@ -788,6 +788,7 @@ namespace Assignment {
               if (av[0] == 0 && av[1] == 0 && av[2] == 0 &&
                   bv[0] == 0 && bv[1] == 0 && bv[2] == 0){
                 // Camera doesn't intersect object so no shine or shadow
+                cout << "Camera doesn't intersect object so no shine or shadow" << endl;
                 return;
               }
 

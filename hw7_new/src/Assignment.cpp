@@ -722,7 +722,7 @@ namespace Assignment {
     Vector3f dummylighting(const Vector3f &Pv, const Vector3f &nv,
       const Primitive* prm, const vector<PointLight> &lights, const Vector3f &em){
 
-      Vector3f color(1,1,1);
+      Vector3f color(0,1,1);
       //printInfo(const Renderable* ren, int indent)
       //printInfo(prm, 2);
 

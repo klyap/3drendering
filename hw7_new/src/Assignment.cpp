@@ -368,10 +368,14 @@ namespace Assignment {
         // cout << "==NEW g prime: " << gprime << " g: " << g << endl;
         // cout << "==NEW t: " << t << endl;
       }
+      if (gprime < 0.0 && (-1.0/20 < g && g < 1.0/20)){
+        return make_pair(normal, rayt);
+      }
       cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
       cout << "==FINAL t: " << t << endl;
 
-      return make_pair(normal, rayt);
+      Vector3f zeroes(0, 0, 0);
+      return make_pair(zeroes , zeroes);
     }
 
     void recurse_findIntersection(

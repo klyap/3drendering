@@ -652,9 +652,9 @@ namespace Assignment {
         glEnd();
 
         //cout << "drew camera_ray origin = " << camera_ray.origin_x << " " <<
-          camera_ray.origin_y << " " << camera_ray.origin_z << endl;
+        //  camera_ray.origin_y << " " << camera_ray.origin_z << endl;
         //cout << "drew intersection_ray origin = " << intersection_ray.origin_x << " " <<
-          intersection_ray.origin_y << " " << intersection_ray.origin_z << endl;
+        //  intersection_ray.origin_y << " " << intersection_ray.origin_z << endl;
         //cout << "drew intersection_ray end = " << endpoint << endl;
     }
 

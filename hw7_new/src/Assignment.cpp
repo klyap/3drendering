@@ -524,7 +524,7 @@ namespace Assignment {
              }
              // Updates referenced t and ray with min + t
              // and the associated Vector3f
-              recurse_findIntersection(d, ray, normal, prm,
+              recurse_findIntersection(d, ray, normal, p,
                av, cam_pos,
                Renderable::get(child_it.second.name),
                transformation_stack);
@@ -759,13 +759,13 @@ namespace Assignment {
               pair<Ray, Primitive*> ray_prm = findIntersection(camera_ray);
               Ray intersection_ray = ray_prm.first;
 
-              av[0] = intersection_ray.first.direction_x; // Normal (ie vn)
-              av[1] = intersection_ray.first.direction_y;
-              av[2] = intersection_ray.first.direction_z;
-              Vector3f bv(intersection_ray.first.origin_x, // Point (ie v)
-                  intersection_ray.first.origin_y,
-                  intersection_ray.first.origin_z);
-              Primitive * prm = intersection_ray.second;
+              av[0] = intersection_ray.direction_x; // Normal (ie vn)
+              av[1] = intersection_ray.direction_y;
+              av[2] = intersection_ray.direction_z;
+              Vector3f bv(intersection_ray.origin_x, // Point (ie v)
+                  intersection_ray.origin_y,
+                  intersection_ray.origin_z);
+              Primitive * prm = ray_prm.second;
 
               if (prm == NULL){
                 // Camera doesn't intersect object so no shine or shadow

@@ -294,9 +294,14 @@ namespace Assignment {
 
       cout << "== abc: " << a << " " << b << " " << c << endl;
 
+      float d =  b*b - 4.0*a*c; // discriminant
+      if (d < 0){
+        cout << "== d < 0 ==" << d << endl;
+        return make_pair(Vector3f(0,0,0), Vector3f(0,0,0));
+      }
+
       float tminus = getTminus(a, b, c);
       float tplus = getTplus(a, b, c);
-      float d =  b*b - 4.0*a*c; // discriminant
       float t_chosen = 0.0;
 
       Vector3f ray = Vector3f(0,0,0);
@@ -304,10 +309,8 @@ namespace Assignment {
 
       cout << "tminus = " << tminus << " tplus = " << tplus << endl;
 
-      if (d < 0){
-        cout << "== d < 0 ==" << d << endl;
-        return make_pair(Vector3f(0,0,0), Vector3f(0,0,0));
-      } else if (tminus == tplus){
+
+      if (tminus == tplus){
         cout << "== equal ==" << endl;
         t_chosen = tminus;
         return iter_newton(t_chosen, av, bv, e, n);
@@ -590,8 +593,8 @@ namespace Assignment {
       // the "return" values
       vector<Transformation> transformation_stack;
       float d = 1000000000000; // Min distance from camera
-      Vector3f ray;
-      Vector3f normal;
+      Vector3f ray(0,0,0);
+      Vector3f normal(0,0,0);
       Primitive* prm;
       recurse_findIntersection(d, ray, normal, &prm,
         av, bv, ren, transformation_stack);
@@ -780,7 +783,8 @@ namespace Assignment {
                   intersection_ray.origin_z);
               Primitive * prm = ray_prm.second;
 
-              if (prm == NULL){
+              if (av[0] == 0 && av[1] == 0 && av[2] == 0 &&
+                  bv[0] == 0 && bv[1] == 0 && bv[2] == 0){
                 // Camera doesn't intersect object so no shine or shadow
                 return;
               }

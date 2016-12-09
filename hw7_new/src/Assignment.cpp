@@ -722,8 +722,9 @@ namespace Assignment {
     Vector3f dummylighting(const Vector3f &Pv, const Vector3f &nv,
       const Primitive* prm, const vector<PointLight> &lights, const Vector3f &em){
 
+      Vector3f color(1,1,1);
       //printInfo(const Renderable* ren, int indent)
-      printInfo(prm, 2);
+      //printInfo(prm, 2);
 
       // // Empty vector
       // Vector3d empty(0,0,0);
@@ -733,8 +734,9 @@ namespace Assignment {
       // Vector3d P(Pv.x, Pv.y, Pv.z); // point position
       // Vector3d n(nv.x, nv.y, nv.z); // surface normal
       // Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
-      Vector3f temp;
-      return temp;
+
+
+      return color;
     }
 
 

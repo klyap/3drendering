@@ -796,6 +796,7 @@ namespace Assignment {
                 dummylighting(bv, av, prm, scene.lights, e1);
 
               png.setPixel(i, j, c[0] * 255, c[1] * 255, c[2] * 255);
+              cout << "--color: (" << i << ", " << j << ") = " << c << endl;
             }
         }
 

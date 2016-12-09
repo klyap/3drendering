@@ -789,14 +789,14 @@ namespace Assignment {
                   bv[0] == 0 && bv[1] == 0 && bv[2] == 0){
                 // Camera doesn't intersect object so no shine or shadow
                 cout << "Camera doesn't intersect object so no shine or shadow" << endl;
-                return;
+                continue;
               }
 
               Vector3f c =
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
                 dummylighting(bv, av, prm, scene.lights, e1);
 
-              png.setPixel(i, j, c[0] * 255, c[1] * 255, c[2] * 255);
+              png.setPixel(i, j, floor(c[0] * 255), floor(c[1] * 255), c[2] * 255);
               cout << "--color: (" << i << ", " << j << ") = " << c << endl;
             }
         }

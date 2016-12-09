@@ -523,7 +523,7 @@ namespace Assignment {
                  transformation_stack.push_back(child_trans.at(i));
              }
              // Updates referenced t and ray with min + t
-             // and the associated Vec3f
+             // and the associated Vector3f
               recurse_findIntersection(d, ray, normal, prm,
                av, cam_pos,
                Renderable::get(child_it.second.name),
@@ -647,62 +647,62 @@ namespace Assignment {
     /* Assignment Part B */
     // n = normal vector of x, y, z
     // e = camera position
-    Vector3d lighting_model(const Vertex &Pv, const Vertex &nv, const Material &material,
-                        const vector<Light> &lights, const MatrixXd &em){
-      // Empty vector
-      Vector3d empty(0,0,0);
-      Vector3d ones(1,1,1);
-
-      // Convert to vector
-      Vector3d P(Pv.x, Pv.y, Pv.z); // point position
-      Vector3d n(nv.x, nv.y, nv.z); // surface normal
-      Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
-
-      Vector3d cd(material.diffuse.r, material.diffuse.g, material.diffuse.b);
-      Vector3d ca(material.ambient.r, material.ambient.g, material.ambient.b);
-      Vector3d cs(material.specular.r, material.specular.g, material.specular.b);
-      double p = material.shininess;
-
-      Vector3d diffuse_sum(0,0,0);
-      Vector3d specular_sum(0,0,0);
-
-      Vector3d e_direction = (e - P).normalized();
-
-      Vector3d lp(0,0,0); // light position
-      Vector3d lc(0,0,0); // light color
-
-      Vector3d l_direction, l_diffuse, l_specular;
-
-      for (auto &l : lights){
-        lp << l.x, l.y, l.z;
-        lc << l.rgb.r, l.rgb.g, l.rgb.b;
-
-        // Include attenuation
-        // Distance between light and point
-        double d = (lp - P).norm();
-        lc = lc * (1.0 / (1 + l.attenuation * d * d));
-
-        // Find diffuse
-        Vector3d l_direction = (lp - P).normalized();
-        l_diffuse = lc * max(0.0, n.dot(l_direction));
-        diffuse_sum += l_diffuse;
-
-        // Find specular
-        l_specular = lc * pow(max(0.0,
-          n.dot((e_direction + l_direction).normalized())), p);
-        specular_sum += l_specular;
-      }
-
-      //component-wise min function and component-wise product
-      Vector3d c = ones.cwiseMin(ca
-                    + diffuse_sum.cwiseProduct(cd)
-                    + specular_sum.cwiseProduct(cs));
-      return c;
-    }
+    // Vector3d lighting_model(const Vertex &Pv, const Vertex &nv, const Material &material,
+    //                     const vector<Light> &lights, const MatrixXd &em){
+    //   // Empty vector
+    //   Vector3d empty(0,0,0);
+    //   Vector3d ones(1,1,1);
+    //
+    //   // Convert to vector
+    //   Vector3d P(Pv.x, Pv.y, Pv.z); // point position
+    //   Vector3d n(nv.x, nv.y, nv.z); // surface normal
+    //   Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
+    //
+    //   Vector3d cd(material.diffuse.r, material.diffuse.g, material.diffuse.b);
+    //   Vector3d ca(material.ambient.r, material.ambient.g, material.ambient.b);
+    //   Vector3d cs(material.specular.r, material.specular.g, material.specular.b);
+    //   double p = material.shininess;
+    //
+    //   Vector3d diffuse_sum(0,0,0);
+    //   Vector3d specular_sum(0,0,0);
+    //
+    //   Vector3d e_direction = (e - P).normalized();
+    //
+    //   Vector3d lp(0,0,0); // light position
+    //   Vector3d lc(0,0,0); // light color
+    //
+    //   Vector3d l_direction, l_diffuse, l_specular;
+    //
+    //   for (auto &l : lights){
+    //     lp << l.x, l.y, l.z;
+    //     lc << l.rgb.r, l.rgb.g, l.rgb.b;
+    //
+    //     // Include attenuation
+    //     // Distance between light and point
+    //     double d = (lp - P).norm();
+    //     lc = lc * (1.0 / (1 + l.attenuation * d * d));
+    //
+    //     // Find diffuse
+    //     Vector3d l_direction = (lp - P).normalized();
+    //     l_diffuse = lc * max(0.0, n.dot(l_direction));
+    //     diffuse_sum += l_diffuse;
+    //
+    //     // Find specular
+    //     l_specular = lc * pow(max(0.0,
+    //       n.dot((e_direction + l_direction).normalized())), p);
+    //     specular_sum += l_specular;
+    //   }
+    //
+    //   //component-wise min function and component-wise product
+    //   Vector3d c = ones.cwiseMin(ca
+    //                 + diffuse_sum.cwiseProduct(cd)
+    //                 + specular_sum.cwiseProduct(cs));
+    //   return c;
+    // }
 
     // n = normal vector of x, y, z
     // e = camera position
-    Vector3d dummylighting(const Vector3f &Pv, const Vector3f &nv,
+    Vector3f dummylighting(const Vector3f &Pv, const Vector3f &nv,
       const Primitive* prm, const vector<PointLight> &lights, const MatrixXd &em){
 
       //printInfo(const Renderable* ren, int indent)
@@ -748,9 +748,9 @@ namespace Assignment {
 
               // Find intersection point p
               Ray camera_ray;
-              camera_ray.origin_x = camera->getPosition()[0];
-              camera_ray.origin_y = camera->getPosition()[1];
-              camera_ray.origin_z = camera->getPosition()[2];
+              camera_ray.origin_x = camera.getPosition()[0];
+              camera_ray.origin_y = camera.getPosition()[1];
+              camera_ray.origin_z = camera.getPosition()[2];
               camera_ray.direction_x = av[0];
               camera_ray.direction_y = av[1];
               camera_ray.direction_z = av[2];
@@ -760,7 +760,7 @@ namespace Assignment {
               av[0] = intersection_ray.first.direction_x; // Normal (ie vn)
               av[1] = intersection_ray.first.direction_y;
               av[2] = intersection_ray.first.direction_z;
-              Vec3f bv(intersection_ray.first.origin_x, // Point (ie v)
+              Vector3f bv(intersection_ray.first.origin_x, // Point (ie v)
                   intersection_ray.first.origin_y,
                   intersection_ray.first.origin_z);
               Primitive * prm = intersection_ray.second;
@@ -772,7 +772,7 @@ namespace Assignment {
 
               Vector3f c =
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
-                dummylighting(bv, av, prm, lights, e);
+                dummylighting(bv, av, prm, lights, e1);
 
               png.setPixel(i, j, c[0] * 255, c[0] * 255, c[0] * 255);
             }

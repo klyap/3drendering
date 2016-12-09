@@ -468,6 +468,8 @@ namespace Assignment {
         // Pull into Vec4 for 4x4 rotation matrices
         Vector4f ray4(new_position[0], new_position[1], new_position[2], 1);
         Vector4f normal4(new_normal[0], new_normal[1], new_normal[2], 1);
+        cout << "== Before Position transformed back out: " << ray4 << endl;
+        cout << "== Before normal4 transformed back out: " << normal4 << endl;
 
         // Transform position and normal back into normal coords
         //Matrix4f forward_inv = forward.inverse();

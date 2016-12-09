@@ -25,9 +25,9 @@ namespace Assignment {
     // BEGIN -----------------------------------------------
     Matrix4f makeRotationQuat(Vector4f unit_q){
       // Convert to unit quarternion
-      cout << "ini rotation quarternion: " << unit_q << endl;
+      //cout << "ini rotation quarternion: " << unit_q << endl;
       unit_q = unit_q.normalized();
-      cout << "rotation normalized: " << unit_q << endl;
+      //cout << "rotation normalized: " << unit_q << endl;
       float qs = unit_q[0];
       float qx = unit_q[1];
       float qy = unit_q[2];
@@ -59,7 +59,7 @@ namespace Assignment {
       Matrix4f transform(4,4);
 
       if (type == TRANS){
-        cout << "Transform stack: trans " << type << endl;
+        //cout << "Transform stack: trans " << type << endl;
         transform <<
                  1, 0, 0, t.trans[0],
                  0, 1, 0, t.trans[1],
@@ -67,7 +67,7 @@ namespace Assignment {
                  0, 0, 0, 1;
       }
       else if (type == SCALE){
-        cout << "Transform scale: scale " << type << endl;
+        //cout << "Transform scale: scale " << type << endl;
         transform <<
                  t.trans[0], 0, 0, 0,
                  0, t.trans[1], 0, 0,
@@ -77,12 +77,12 @@ namespace Assignment {
       } else if (type == ROTATE){
         // Given coords in quaternion
         // Convert to normal axes and invert
-        cout << "Transform scale: rotate " << type << endl;
+        //cout << "Transform scale: rotate " << type << endl;
         //makeRotateMat(float *matrix, float x, float y, float z, float angle);
         transform = makeRotationQuat(t.trans);
       }
 
-      cout << transform << endl;
+      //cout << transform << endl;
       return transform;
     }
 
@@ -91,14 +91,14 @@ namespace Assignment {
       Matrix4f transform(4,4);
 
       if (type == TRANS){
-        cout << "Transform stack: trans " << type << endl;
+        //cout << "Transform stack: trans " << type << endl;
         transform << 1, 0, 0, -1.0 * t.trans[0],
                  0, 1, 0, -1.0 * t.trans[1],
                  0, 0, 1, -1.0 * t.trans[2],
                  0, 0, 0, 1;
       }
       else if (type == SCALE){
-        cout << "Transform scale: scale " << type << endl;
+        //cout << "Transform scale: scale " << type << endl;
         transform <<
                  1/t.trans[0], 0, 0, 0,
                  0, 1/t.trans[1], 0, 0,
@@ -108,12 +108,12 @@ namespace Assignment {
       } else if (type == ROTATE){
         // Given coords in quaternion
         // Convert to normal axes and invert
-        cout << "Transform scale: rotate " << type << endl;
+        //cout << "Transform scale: rotate " << type << endl;
         //makeRotateMat(float *matrix, float x, float y, float z, float angle);
         transform = makeRotationQuat(t.trans).transpose();
       }
 
-      cout << transform << endl;
+      //cout << transform << endl;
       return transform;
     }
 
@@ -152,7 +152,7 @@ namespace Assignment {
                 Transformation(SCALE, ini_scale_coords[0], ini_scale_coords[1],ini_scale_coords[2],1.0);
              Matrix4f transform = makeInvTransform(ini_scale);
              coords = coords.transpose() * transform;
-             cout << "coords after init scale: " << coords << endl;
+             //cout << "coords after init scale: " << coords << endl;
 
              for (int i = 0; i < transformation_stack.size(); i++){
                Matrix4f transform = makeInvTransform(transformation_stack.at(i));
@@ -162,7 +162,7 @@ namespace Assignment {
              // Do in/out test
              float check_inside = sq_io(coords[0], coords[1], coords[2],
                prm->getExp0(), prm->getExp1());
-             cout << "sq_io returned: " << check_inside << endl;
+             //cout << "sq_io returned: " << check_inside << endl;
              if (check_inside < 0){
                return true;
              }
@@ -287,16 +287,16 @@ namespace Assignment {
     // Finds final t based on tplus and tminus conditions
     // Returns the normal and position (aka new av and bv)
     pair<Vector3f, Vector3f> newton(Vector3f av, Vector3f bv, float e, float n){
-      cout << "== newton == "<< endl;
+      //cout << "== newton == "<< endl;
       float a = av.dot(av);
       float b = 2.0 * av.dot(bv);
       float c = bv.dot(bv) - 3.0;
 
-      cout << "== abc: " << a << " " << b << " " << c << endl;
+      //cout << "== abc: " << a << " " << b << " " << c << endl;
 
       float d =  b*b - 4.0*a*c; // discriminant
       if (d < 0){
-        cout << "== d < 0 ==" << d << endl;
+        //cout << "== d < 0 ==" << d << endl;
         return make_pair(Vector3f(0,0,0), Vector3f(0,0,0));
       }
 
@@ -307,22 +307,22 @@ namespace Assignment {
       Vector3f ray = Vector3f(0,0,0);
       Vector3f normal = Vector3f(0,0,0);;
 
-      cout << "tminus = " << tminus << " tplus = " << tplus << endl;
+      //cout << "tminus = " << tminus << " tplus = " << tplus << endl;
 
 
       if (tminus == tplus){
-        cout << "== equal ==" << endl;
+        //cout << "== equal ==" << endl;
         t_chosen = tminus;
         return iter_newton(t_chosen, av, bv, e, n);
         // return make_pair(t_chosen,
         //   getRay(iter_newton(tminus, av, bv, e, n), av, bv));
       } else if (tminus > 0 && tplus > 0){ // Start of 2 solution cases
-        cout << "== both + ==" << endl;
+        //cout << "== both + ==" << endl;
         t_chosen = tminus;
 
         return iter_newton(tminus, av, bv, e, n);
       } else if (tminus * tplus < 0) { // they're of opposite signs
-          cout << "== opposite signs ==" << endl;
+          //cout << "== opposite signs ==" << endl;
           // float actual_tminus = iter_newton(tminus, av, bv, e, n);
           // float actual_tplus = iter_newton(tplus, av, bv, e, n);
           //
@@ -349,19 +349,19 @@ namespace Assignment {
       //   // t+ and t- are both negative
       //   return Vector3f(0,0,0);
       // }
-      cout << "== newton didn't go into any tests ==" << endl;
+      //cout << "== newton didn't go into any tests ==" << endl;
       return make_pair(normal, ray); // should default to Vector3f(0,0,0)
     }
 
     // Gets final t; returns normal and position
     pair<Vector3f, Vector3f> iter_newton(float t, Vector3f av, Vector3f bv, float e, float n){
-      cout << "== Iter newton ==" << endl;
+      //cout << "== Iter newton ==" << endl;
       Vector3f rayt = getRay(t, av, bv);
       Vector3f normal = grad_sq_io(rayt[0], rayt[1], rayt[2], e, n);
       float gprime = av.dot(normal);
       float g = sq_io(rayt[0], rayt[1], rayt[2], e, n);
-      cout << "==INIT g prime: " << gprime << " g: " << g << endl;
-      cout << "==INIT t: " << t << endl;
+      //cout << "==INIT g prime: " << gprime << " g: " << g << endl;
+      //cout << "==INIT t: " << t << endl;
       while ((-1.0/20 >= g || g >= 1.0/20) && gprime <= 0.0){ // stopping condition
         rayt = getRay(t, av, bv);
         gprime = av.dot(grad_sq_io(rayt[0], rayt[1], rayt[2], e, n));
@@ -374,8 +374,8 @@ namespace Assignment {
       if (gprime < 0.0 && (-1.0/20 < g && g < 1.0/20)){
         return make_pair(normal, rayt);
       }
-      cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
-      cout << "==FINAL t: " << t << endl;
+      //cout << "==FINAL g prime: " << gprime << " g: " << g << endl;
+      //cout << "==FINAL t: " << t << endl;
 
       Vector3f zeroes(0, 0, 0);
       return make_pair(zeroes , zeroes);
@@ -391,7 +391,7 @@ namespace Assignment {
 
       if (ren->getType() == PRM) {
         // Got to "leaf" of recursion; do stuff here
-        cout << "== In PRM == " << endl;
+        //cout << "== In PRM == " << endl;
         Primitive *prm = dynamic_cast<Primitive*>(ren);
 
         // Apply all inverse transforms to av
@@ -427,7 +427,7 @@ namespace Assignment {
         //for (int i = transformation_stack.size(); i > 0; i--){
         for (int i = 0; i < transformation_stack.size(); i++){
           Matrix4f transform = makeTransform(transformation_stack.at(i));
-          cout << "Transform stack = " << transform << endl;
+          //cout << "Transform stack = " << transform << endl;
           forward *= transform;
           if (transformation_stack.at(i).type == SCALE ||
               transformation_stack.at(i).type == ROTATE){
@@ -436,27 +436,24 @@ namespace Assignment {
           }
         }
 
-        cout << "forward" << forward << endl;
-        cout << "forward_SR" << forward_SR << endl;
+        //cout << "forward" << forward << endl;
+        //cout << "forward_SR" << forward_SR << endl;
 
         // Direction/normal (SR only)
         Matrix4f forward_SR_inv = forward_SR.inverse();
         av4 = forward_SR_inv * av4;
-        cout << "direction after all transforms: " << av4 << endl;
+        //cout << "direction after all transforms: " << av4 << endl;
         av[0] = av4[0];
         av[1] = av4[1];
         av[2] = av4[2];
-        //cout << "av origin after all transforms: " << av << endl;
-
 
         // Position (all transforms)
         Matrix4f forward_inv = forward.inverse();
         bv4 = forward_inv * bv4;
-        cout << "position after all transforms: " << bv4 << endl;
+        //cout << "position after all transforms: " << bv4 << endl;
         bv[0] = bv4[0];
         bv[1] = bv4[1];
         bv[2] = bv4[2];
-        //cout << "bv after all transforms: " << bv << endl;
 
         // Do newton computations in superquadric space (or whatever it's called)
         pair<Vector3f, Vector3f> new_ray_t =
@@ -464,15 +461,15 @@ namespace Assignment {
 
         Vector3f new_normal = new_ray_t.first;
         Vector3f new_position = new_ray_t.second;
-        cout << "==Output position: " << new_position << endl; // New position
-        cout << "==Output normal: " << new_normal << endl; // New normal
+        //cout << "==Output position: " << new_position << endl; // New position
+        //cout << "==Output normal: " << new_normal << endl; // New normal
 
         // Transform position and normals back out of superquadric space
         // Pull into Vec4 for 4x4 rotation matrices
         Vector4f ray4(new_position[0], new_position[1], new_position[2], 1);
         Vector4f normal4(new_normal[0], new_normal[1], new_normal[2], 1);
-        cout << "== Before Position transformed back out: " << ray4 << endl;
-        cout << "== Before normal4 transformed back out: " << normal4 << endl;
+        //cout << "== Before Position transformed back out: " << ray4 << endl;
+        //cout << "== Before normal4 transformed back out: " << normal4 << endl;
 
         // Catch when there is no intersection (default return = (0,0,0))
         if (new_normal[0] == 0 && new_normal[1] == 0 && new_normal[2] == 0 &&
@@ -497,13 +494,13 @@ namespace Assignment {
         // backward *= transform;
         // backward_SR *= transform;
 
-        cout << "== Position transformed back out: " << ray4 << endl;
-        cout << "== normal4 transformed back out: " << normal4 << endl;
+        //cout << "== Position transformed back out: " << ray4 << endl;
+        //cout << "== normal4 transformed back out: " << normal4 << endl;
 
         // Return: pick minimum distance from camera to new intersection position
         float d_new = (ray - cam_pos).norm();
-        cout << "d_new: " << d_new << endl;
-        cout << "d old: " << d << endl;
+        //cout << "d_new: " << d_new << endl;
+        //cout << "d old: " << d << endl;
         if (d_new < d){
           // Update new minimum a and b
           d = d_new;
@@ -513,13 +510,13 @@ namespace Assignment {
           normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
           *p = prm;
 
-          cout << "found new min d: " << d << endl;
-          cout << "pos: " << ray << endl;
-          cout << "normal: " << normal << endl;
+          //cout << "found new min d: " << d << endl;
+          //cout << "pos: " << ray << endl;
+          //cout << "normal: " << normal << endl;
         }
 
-        cout << "==Global ray: " << ray << endl;
-        cout << "==Global normal: " << normal << endl;
+        //cout << "==Global ray: " << ray << endl;
+        //cout << "==Global normal: " << normal << endl;
 
       } else if (ren->getType() == OBJ) {
         // Iterate over children until you get to a primitive
@@ -559,7 +556,7 @@ namespace Assignment {
     }
 
     pair<Ray, Primitive*> findIntersection(const Ray &camera_ray) {
-      cout << "===============findIntersection=============" << endl;
+      //cout << "===============findIntersection=============" << endl;
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;
       intersection_ray.origin_y = 1.0;
@@ -574,8 +571,8 @@ namespace Assignment {
       // Position of camera
       Vector3f bv = Vector3f(
         camera_ray.origin_x, camera_ray.origin_y, camera_ray.origin_z);
-      cout << "av= " << av << endl;
-      cout << "bv= " << bv << endl;
+      //cout << "av= " << av << endl;
+      //cout << "bv= " << bv << endl;
 
       // Prep for recursing over tree
       const Line* cur_state = CommandLine::getState();
@@ -599,9 +596,9 @@ namespace Assignment {
       recurse_findIntersection(d, ray, normal, &prm,
         av, bv, ren, transformation_stack);
 
-      cout << "==Returned ray origin: " << ray << endl;
-      cout << "==Returned ray dir/normal: " << normal << endl;
-      cout << "==Returned primitive: " << prm->getSpecular() << endl;
+      //cout << "==Returned ray origin: " << ray << endl;
+      //cout << "==Returned ray dir/normal: " << normal << endl;
+      //cout << "==Returned primitive: " << prm->getSpecular() << endl;
 
       // Package into Ray obj
       intersection_ray.origin_x = ray[0];
@@ -631,7 +628,7 @@ namespace Assignment {
         Ray camera_ray;
         camera_ray.origin_x = 0;
         camera_ray.origin_y = 0;
-        camera_ray.origin_z = 10;
+        camera_ray.origin_z = 5;
         camera_ray.direction_x = 0.0;
         camera_ray.direction_y = 0.0;
         camera_ray.direction_z = -1.0;
@@ -654,11 +651,11 @@ namespace Assignment {
         glVertex3f(endpoint[0], endpoint[1], endpoint[2]);
         glEnd();
 
-        cout << "drew camera_ray origin = " << camera_ray.origin_x << " " <<
+        //cout << "drew camera_ray origin = " << camera_ray.origin_x << " " <<
           camera_ray.origin_y << " " << camera_ray.origin_z << endl;
-        cout << "drew intersection_ray origin = " << intersection_ray.origin_x << " " <<
+        //cout << "drew intersection_ray origin = " << intersection_ray.origin_x << " " <<
           intersection_ray.origin_y << " " << intersection_ray.origin_z << endl;
-        cout << "drew intersection_ray end = " << endpoint << endl;
+        //cout << "drew intersection_ray end = " << endpoint << endl;
     }
 
     /* Assignment Part B */

@@ -705,7 +705,7 @@ namespace Assignment {
     // n = normal vector of x, y, z
     // e = camera position
     Vector3f dummylighting(const Vector3f &Pv, const Vector3f &nv,
-      const Primitive* prm, const vector<PointLight> &lights, const MatrixXd &em){
+      const Primitive* prm, const vector<PointLight> &lights, const Vector3f &em){
 
       //printInfo(const Renderable* ren, int indent)
       printInfo(prm, 2);

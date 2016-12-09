@@ -722,7 +722,7 @@ namespace Assignment {
     Vector3f dummylighting(const Vector3f &Pv, const Vector3f &nv,
       const Primitive* prm, const vector<PointLight> &lights, const Vector3f &em){
 
-      Vector3f color(0,1,1);
+      Vector3f color(0.0,1.0,1.0);
       //printInfo(const Renderable* ren, int indent)
       //printInfo(prm, 2);
 
@@ -795,7 +795,7 @@ namespace Assignment {
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
                 dummylighting(bv, av, prm, scene.lights, e1);
 
-              png.setPixel(i, j, c[0] * 255, c[0] * 255, c[0] * 255);
+              png.setPixel(i, j, c[0] * 255, c[1] * 255, c[2] * 255);
             }
         }
 

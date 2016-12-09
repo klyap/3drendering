@@ -492,7 +492,7 @@ namespace Assignment {
         if (d_new < d){
           // Update new minimum a and b
           d = d_new;
-          
+
           // Put back into vec3
           ray[0] = ray4[0]; ray[1] = ray4[1]; ray[2] = ray4[2];
           normal[0] = normal4[0]; normal[1] = normal4[1]; normal[2] = normal4[2];
@@ -734,14 +734,14 @@ namespace Assignment {
         // REPLACE THIS WITH YOUR CODE
         for (int i = 0; i < XRES; i++) {
             for (int j = 0; j < YRES; j++) {
-              float h = 2.0 * camera->near * tan(camera->fov / 2);
-              float w = camera->aspect * h;
+              float h = 2.0 * camera.near * tan(camera.fov / 2);
+              float w = camera.aspect * h;
 
               float xi = (i - XRES/2.0) * w/XRES;
               float yj = (j - YRES/2.0) * h/YRES;
 
               // av = direction, bv = position
-              Vector3f av = n * e1 + xi * e2 + yj * e3;
+              Vector3f av = camera.near * e1 + xi * e2 + yj * e3;
 
               // a = intersection point - light position
               // light position = scene->lights[0].position (know there's only 1 light)

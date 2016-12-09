@@ -571,7 +571,8 @@ namespace Assignment {
       }
 
        if (ren == NULL) {
-           return make_pair(intersection_ray, NULL);
+          Primitive* temp_p;
+          return make_pair(intersection_ray, temp_p);
        }
 
       // the "return" values
@@ -624,7 +625,7 @@ namespace Assignment {
         // camera_ray.direction_z = cam_dir[2];
 
         pair<Ray, Primitive*> ray_prm = findIntersection(camera_ray);
-        Ray intersection_ray = findIntersection.first;
+        Ray intersection_ray = ray_prm.first;
 
         const float IO_test_color[3] = {0.0, 0.5, 0.5};
         glMaterialfv(GL_FRONT, GL_AMBIENT, IO_test_color);

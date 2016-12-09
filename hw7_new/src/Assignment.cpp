@@ -548,7 +548,7 @@ namespace Assignment {
     }
 
     pair<Ray, Primitive*> findIntersection(const Ray &camera_ray) {
-
+      console.log("===============findIntersection=============");
       Ray intersection_ray;
       intersection_ray.origin_x = 0.0;
       intersection_ray.origin_y = 1.0;

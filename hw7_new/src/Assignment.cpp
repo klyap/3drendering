@@ -708,14 +708,14 @@ namespace Assignment {
       //printInfo(const Renderable* ren, int indent)
       printInfo(prm, 2)
 
-      // Empty vector
-      Vector3d empty(0,0,0);
-      Vector3d ones(1,1,1);
-
-      // Convert to vector
-      Vector3d P(Pv.x, Pv.y, Pv.z); // point position
-      Vector3d n(nv.x, nv.y, nv.z); // surface normal
-      Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
+      // // Empty vector
+      // Vector3d empty(0,0,0);
+      // Vector3d ones(1,1,1);
+      //
+      // // Convert to vector
+      // Vector3d P(Pv.x, Pv.y, Pv.z); // point position
+      // Vector3d n(nv.x, nv.y, nv.z); // surface normal
+      // Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
 
       return P;
     }
@@ -772,7 +772,7 @@ namespace Assignment {
 
               Vector3f c =
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
-                dummylighting(bv, av, prm, lights, e1);
+                dummylighting(bv, av, prm, scene.lights, e1);
 
               png.setPixel(i, j, c[0] * 255, c[0] * 255, c[0] * 255);
             }

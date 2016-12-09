@@ -716,8 +716,8 @@ namespace Assignment {
       // Vector3d P(Pv.x, Pv.y, Pv.z); // point position
       // Vector3d n(nv.x, nv.y, nv.z); // surface normal
       // Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
-
-      return P;
+      Vector3f temp;
+      return temp;
     }
 
 

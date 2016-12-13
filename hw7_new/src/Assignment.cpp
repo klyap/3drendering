@@ -628,7 +628,7 @@ namespace Assignment {
         Ray camera_ray;
         camera_ray.origin_x = 0;
         camera_ray.origin_y = 0;
-        camera_ray.origin_z = 1.1;
+        camera_ray.origin_z = 10;
         camera_ray.direction_x = 0.0;
         camera_ray.direction_y = 0.0;
         camera_ray.direction_z = -1.0;

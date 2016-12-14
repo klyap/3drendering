@@ -842,7 +842,7 @@ namespace Assignment {
               c[0] = floor(c[0] * 255);
               c[1] = floor(c[1] * 255);
               c[2] = floor(c[2] * 255);
-              png.setPixel(j, i, c[0], c[1], c[2]);
+              png.setPixel(i, YRES-j, c[0], c[1], c[2]);
               cout << "--color: (" << i << ", " << j << ") = " << c << endl;
             }
         }

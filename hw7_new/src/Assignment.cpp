@@ -775,6 +775,7 @@ namespace Assignment {
       Vector3f c = ones.cwiseMin(ca
                     + diffuse_sum.cwiseProduct(cd)
                     + specular_sum.cwiseProduct(cs));
+      cout << "color = " << c << endl;
       return c;
 
       //return color;
@@ -839,7 +840,7 @@ namespace Assignment {
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
                 dummylighting(bv, av, prm, scene.lights, e1);
 
-              png.setPixel(i, j, floor(c[0] * 255), floor(c[1] * 255), c[2] * 255);
+              png.setPixel(j, i, floor(c[0] * 255), floor(c[1] * 255), c[2] * 255);
               cout << "--color: (" << i << ", " << j << ") = " << c << endl;
             }
         }

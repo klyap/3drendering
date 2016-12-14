@@ -745,7 +745,8 @@ namespace Assignment {
       Vector3f lp(0,0,0); // light position
       Vector3f lc(0,0,0); // light color
 
-      Vector3f l_direction, l_diffuse, l_specular;
+      //Vector3f l_direction, l_diffuse, l_specular;
+      Vector3f l_diffuse, l_specular;
 
       for (auto &l : lights){
         // Include attenuation
@@ -755,12 +756,13 @@ namespace Assignment {
 
         // Find diffuse
         Vector3f l_direction = (lp - P).normalized();
-        l_diffuse = lc * max(0.0, n.dot(l_direction));
+        float temp = n.dot(l_direction);
+        l_diffuse = lc * max(0.0, temp);
         diffuse_sum += l_diffuse;
 
         // Find specular
-        l_specular = lc * pow(max(0.0,
-          n.dot((e_direction + l_direction).normalized())), p);
+        temp = n.dot((e_direction + l_direction).normalized());
+        l_specular = lc * pow(max(0.0,temp), p);
         specular_sum += l_specular;
       }
 

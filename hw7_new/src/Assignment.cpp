@@ -751,13 +751,14 @@ namespace Assignment {
       for (auto &l : lights){
         // Include attenuation
         // Distance between light and point
-        float d = (PointLight - P).norm();
+        double d = (PointLight - P).norm();
         lc = lc * (1.0 / (1 + l.k * d * d));
 
         // Find diffuse
         Vector3f l_direction = (lp - P).normalized();
-        float temp = n.dot(l_direction);
-        l_diffuse = lc * max(0.0, temp);
+        double temp = n.dot(l_direction);
+        double zero = 0.0;
+        l_diffuse = lc * max(zero, temp);
         diffuse_sum += l_diffuse;
 
         // Find specular

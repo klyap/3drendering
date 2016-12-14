@@ -728,9 +728,9 @@ namespace Assignment {
       Vector3f ones(1,1,1);
 
       // Convert to vector
-      Vector3f P(Pv.x, Pv.y, Pv.z); // point position
-      Vector3f n(nv.x, nv.y, nv.z); // surface normal
-      Vector3f e(em(0,0), em(1,0), em(2,0)); // camera pos
+      Vector3f P(Pv[0], Pv[1], Pv[2]); // point position
+      Vector3f n(nv[0], nv[2], nv[2]); // surface normal
+      Vector3f e(em[0], em[1], em[2]; // camera pos
 
       Vector3f cd(prm->getDiffuse(), prm->getDiffuse(), prm->getDiffuse());
       Vector3f ca(prm->getAmbient(), prm->getAmbient(), prm->getAmbient());
@@ -749,9 +749,13 @@ namespace Assignment {
       Vector3f l_diffuse, l_specular;
 
       for (auto &l : lights){
+
+        lp << l.position[0], l.position[1], l.position[2];
+        lc << l.color[0], l.color[1], l.color[2];
+
         // Include attenuation
         // Distance between light and point
-        double d = (PointLight - P).norm();
+        double d = (lp - P).norm();
         lc = lc * (1.0 / (1 + l.k * d * d));
 
         // Find diffuse

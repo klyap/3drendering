@@ -723,17 +723,54 @@ namespace Assignment {
       //printInfo(const Renderable* ren, int indent)
       //printInfo(prm, 2);
 
-      // // Empty vector
-      // Vector3d empty(0,0,0);
-      // Vector3d ones(1,1,1);
-      //
-      // // Convert to vector
-      // Vector3d P(Pv.x, Pv.y, Pv.z); // point position
-      // Vector3d n(nv.x, nv.y, nv.z); // surface normal
-      // Vector3d e(em(0,0), em(1,0), em(2,0)); // camera pos
+      // Empty vector
+      Vector3f empty(0,0,0);
+      Vector3f ones(1,1,1);
 
+      // Convert to vector
+      Vector3f P(Pv.x, Pv.y, Pv.z); // point position
+      Vector3f n(nv.x, nv.y, nv.z); // surface normal
+      Vector3f e(em(0,0), em(1,0), em(2,0)); // camera pos
 
-      return color;
+      Vector3f cd(prm->getDiffuse(), prm->getDiffuse(), prm->getDiffuse());
+      Vector3f ca(prm->getAmbient(), prm->getAmbient(), prm->getAmbient());
+      Vector3f cs(prm->getSpecular(), prm->getSpecular(), prm->getSpecular());
+      double p = prm->getGloss();
+
+      Vector3f diffuse_sum(0,0,0);
+      Vector3f specular_sum(0,0,0);
+
+      Vector3f e_direction = (e - P).normalized();
+
+      Vector3f lp(0,0,0); // light position
+      Vector3f lc(0,0,0); // light color
+
+      Vector3f l_direction, l_diffuse, l_specular;
+
+      for (auto &l : lights){
+        // Include attenuation
+        // Distance between light and point
+        double d = (PointLight - P).norm();
+        lc = lc * (1.0 / (1 + l.k * d * d));
+
+        // Find diffuse
+        Vector3f l_direction = (lp - P).normalized();
+        l_diffuse = lc * max(0.0, n.dot(l_direction));
+        diffuse_sum += l_diffuse;
+
+        // Find specular
+        l_specular = lc * pow(max(0.0,
+          n.dot((e_direction + l_direction).normalized())), p);
+        specular_sum += l_specular;
+      }
+
+      //component-wise min function and component-wise product
+      Vector3f c = ones.cwiseMin(ca
+                    + diffuse_sum.cwiseProduct(cd)
+                    + specular_sum.cwiseProduct(cs));
+      return c;
+
+      //return color;
     }
 
 

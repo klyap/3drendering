@@ -730,7 +730,7 @@ namespace Assignment {
       // Convert to vector
       Vector3f P(Pv[0], Pv[1], Pv[2]); // point position
       Vector3f n(nv[0], nv[2], nv[2]); // surface normal
-      Vector3f e(em[0], em[1], em[2]; // camera pos
+      Vector3f e(em[0], em[1], em[2]); // camera pos
 
       Vector3f cd(prm->getDiffuse(), prm->getDiffuse(), prm->getDiffuse());
       Vector3f ca(prm->getAmbient(), prm->getAmbient(), prm->getAmbient());

@@ -735,7 +735,7 @@ namespace Assignment {
       Vector3f cd(prm->getDiffuse(), prm->getDiffuse(), prm->getDiffuse());
       Vector3f ca(prm->getAmbient(), prm->getAmbient(), prm->getAmbient());
       Vector3f cs(prm->getSpecular(), prm->getSpecular(), prm->getSpecular());
-      double p = prm->getGloss();
+      float p = prm->getGloss();
 
       Vector3f diffuse_sum(0,0,0);
       Vector3f specular_sum(0,0,0);
@@ -751,7 +751,7 @@ namespace Assignment {
       for (auto &l : lights){
         // Include attenuation
         // Distance between light and point
-        double d = (PointLight - P).norm();
+        float d = (PointLight - P).norm();
         lc = lc * (1.0 / (1 + l.k * d * d));
 
         // Find diffuse

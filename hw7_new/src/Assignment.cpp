@@ -839,8 +839,10 @@ namespace Assignment {
               Vector3f c =
                 //lighting_model(b, av, prm, lights, e); // Do intersect with lights
                 dummylighting(bv, av, prm, scene.lights, e1);
-
-              png.setPixel(j, i, floor(c[0] * 255), floor(c[1] * 255), c[2] * 255);
+              c[0] = floor(c[0] * 255);
+              c[1] = floor(c[1] * 255);
+              c[2] = floor(c[2] * 255);
+              png.setPixel(j, i, c[0], c[1], c[2]);
               cout << "--color: (" << i << ", " << j << ") = " << c << endl;
             }
         }
